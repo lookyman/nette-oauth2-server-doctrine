@@ -133,6 +133,8 @@ Next, you will have to create an approve presenter. Remember that `approveDestin
 class ApprovePresenter extends Presenter
 {
     use ApprovePresenterTrait;
+    
+    // ...
 
     public function actionDefault()
     {
@@ -261,4 +263,28 @@ services:
     - SecretValidator
     oauth2.repository.client:
         arguments: [secretValidator: @SecretValidator]
+```
+
+### User credentials validation
+
+`Lookyman\NetteOAuth2Server\User\UserRepository` validates user credentials by trying to log the user in. However, if your login process is somehow modified, this can easily fail in unexpected ways. In that case you might need to reimplement the credentials validator. Just get the correct user ID the way your application does it, and return `Lookyman\NetteOAuth2Server\User\UserEntity` (or `null` in case of bad credentials).
+
+```php
+class CredentialsValidator
+{
+    public function __invoke($username, $password, $grantType, ClientEntityInterface $clientEntity)
+    {
+        // get the user ID from your application, and
+        return new UserEntity($userId);
+    }
+}
+```
+
+Then register it in the config:
+
+```neon
+services:
+    - CredentialsValidator
+    oauth2.repository.user:
+        arguments: [credentialsValidator: @CredentialsValidator]
 ```
