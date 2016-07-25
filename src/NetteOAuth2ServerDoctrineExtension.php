@@ -19,7 +19,6 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenReposit
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeRepository;
 use Lookyman\NetteOAuth2Server\Storage\IAuthorizationRequestSerializer;
 use Lookyman\NetteOAuth2Server\UI\ApproveControlFactory;
-use Lookyman\NetteOAuth2Server\UI\IApproveControlFactory;
 use Lookyman\NetteOAuth2Server\UI\OAuth2Presenter;
 use Lookyman\NetteOAuth2Server\User\UserRepository;
 use Nette\Application\IPresenterFactory;
@@ -150,8 +149,7 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 				->setClass(IAuthorizationRequestSerializer::class)
 				->setFactory(AuthorizationRequestSerializer::class);
 			$builder->addDefinition($this->prefix('approveControlFactory'))
-				->setClass(IApproveControlFactory::class)
-				->setFactory(ApproveControlFactory::class);
+				->setClass(ApproveControlFactory::class);
 
 			Validators::assertField($config, 'approveDestination', 'string');
 			Validators::assertField($config, 'loginDestination', 'string');
