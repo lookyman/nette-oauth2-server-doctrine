@@ -57,11 +57,27 @@ class ClientEntity implements ClientEntityInterface
 	}
 
 	/**
+	 * @param string|null $secret
+	 */
+	public function setSecret($secret)
+	{
+		$this->secret = $secret;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getIdentifier()
 	{
 		return $this->identifier;
+	}
+
+	/**
+	 * @param string $identifier
+	 */
+	public function setIdentifier($identifier)
+	{
+		$this->identifier = $identifier;
 	}
 
 	/**
@@ -73,10 +89,26 @@ class ClientEntity implements ClientEntityInterface
 	}
 
 	/**
+	 * @param string $name
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getRedirectUri()
 	{
 		return $this->redirectUri;
+	}
+
+	/**
+	 * @param string $uri
+	 */
+	public function setRedirectUri($uri)
+	{
+		$this->redirectUri = $uri;
 	}
 }
