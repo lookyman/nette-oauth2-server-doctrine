@@ -20,9 +20,6 @@
   "require-dev": {
     "phpunit/phpunit": "^5.4"
   },
-  "provide": {
-    "lookyman/nette-oauth2-server-storage-implementation": "^1.0.0"
-  },
   "autoload": {
     "psr-4": {
       "Lookyman\\NetteOAuth2Server\\Storage\\Doctrine\\": "src/"
