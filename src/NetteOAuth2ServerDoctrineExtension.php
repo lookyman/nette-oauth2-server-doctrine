@@ -162,8 +162,6 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 			$presenter->addSetup('setRedirectConfig')
 				->addSetup('setAuthorizationRequestSerializer');
 		}
-
-		// ApproveControl
 	}
 
 	public function beforeCompile()
