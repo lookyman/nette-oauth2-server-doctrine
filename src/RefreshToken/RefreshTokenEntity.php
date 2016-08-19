@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken;
 
@@ -52,7 +53,7 @@ class RefreshTokenEntity implements RefreshTokenEntityInterface
 	/**
 	 * @return bool
 	 */
-	public function isRevoked()
+	public function isRevoked(): bool
 	{
 		return $this->revoked;
 	}
@@ -60,7 +61,7 @@ class RefreshTokenEntity implements RefreshTokenEntityInterface
 	/**
 	 * @param bool $revoked
 	 */
-	public function setRevoked($revoked)
+	public function setRevoked(bool $revoked)
 	{
 		$this->revoked = $revoked;
 	}

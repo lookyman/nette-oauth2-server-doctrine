@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope;
 
@@ -36,6 +37,14 @@ class ScopeEntity implements ScopeEntityInterface
 	public function getIdentifier()
 	{
 		return $this->identifier;
+	}
+
+	/**
+	 * @param string $identifier
+	 */
+	public function setIdentifier(string $identifier)
+	{
+		$this->identifier = $identifier;
 	}
 
 	/**

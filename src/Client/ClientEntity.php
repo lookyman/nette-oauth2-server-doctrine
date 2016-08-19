@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Client;
 
@@ -75,7 +76,7 @@ class ClientEntity implements ClientEntityInterface
 	/**
 	 * @param string $identifier
 	 */
-	public function setIdentifier($identifier)
+	public function setIdentifier(string $identifier)
 	{
 		$this->identifier = $identifier;
 	}
@@ -91,7 +92,7 @@ class ClientEntity implements ClientEntityInterface
 	/**
 	 * @param string $name
 	 */
-	public function setName($name)
+	public function setName(string $name)
 	{
 		$this->name = $name;
 	}
@@ -107,7 +108,7 @@ class ClientEntity implements ClientEntityInterface
 	/**
 	 * @param string $uri
 	 */
-	public function setRedirectUri($uri)
+	public function setRedirectUri(string $uri)
 	{
 		$this->redirectUri = $uri;
 	}

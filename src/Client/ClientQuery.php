@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Client;
 
@@ -17,7 +18,7 @@ class ClientQuery extends QueryObject
 	 * @param string $identifier
 	 * @return self
 	 */
-	public function byIdentifier($identifier)
+	public function byIdentifier(string $identifier): ClientQuery
 	{
 		$this->filters[] = function (QueryBuilder $queryBuilder) use ($identifier) {
 			$queryBuilder->andWhere('c.identifier = :identifier')->setParameter('identifier', $identifier);

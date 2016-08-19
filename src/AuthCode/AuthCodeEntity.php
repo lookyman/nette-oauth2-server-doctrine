@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode;
 
@@ -82,7 +83,7 @@ class AuthCodeEntity implements AuthCodeEntityInterface
 	/**
 	 * @return bool
 	 */
-	public function isRevoked()
+	public function isRevoked(): bool
 	{
 		return $this->revoked;
 	}
@@ -90,7 +91,7 @@ class AuthCodeEntity implements AuthCodeEntityInterface
 	/**
 	 * @param bool $revoked
 	 */
-	public function setRevoked($revoked)
+	public function setRevoked(bool $revoked)
 	{
 		$this->revoked = $revoked;
 	}
