@@ -7,7 +7,7 @@ use League\OAuth2\Server\Entities\ClientEntityInterface;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="nette_oauth2_server_client")
+ * @ORM\Table(name="client")
  */
 class ClientEntity implements ClientEntityInterface
 {

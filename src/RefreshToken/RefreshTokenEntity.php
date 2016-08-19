@@ -8,7 +8,7 @@ use League\OAuth2\Server\Entities\RefreshTokenEntityInterface;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="nette_oauth2_server_refresh_token")
+ * @ORM\Table(name="refresh_token")
  */
 class RefreshTokenEntity implements RefreshTokenEntityInterface
 {

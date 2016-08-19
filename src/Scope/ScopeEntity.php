@@ -7,7 +7,7 @@ use League\OAuth2\Server\Entities\ScopeEntityInterface;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="nette_oauth2_server_scope")
+ * @ORM\Table(name="scope")
  */
 class ScopeEntity implements ScopeEntityInterface
 {

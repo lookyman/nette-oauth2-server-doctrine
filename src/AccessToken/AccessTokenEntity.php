@@ -14,7 +14,7 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="nette_oauth2_server_access_token")
+ * @ORM\Table(name="access_token")
  */
 class AccessTokenEntity implements AccessTokenEntityInterface
 {
@@ -55,7 +55,7 @@ class AccessTokenEntity implements AccessTokenEntityInterface
 
 	/**
 	 * @ORM\ManyToMany(targetEntity="Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity")
-	 * @ORM\JoinTable(name="nette_oauth2_server_access_token_scope")
+	 * @ORM\JoinTable(name="access_token_scope")
 	 * @var Collection of ScopeEntity
 	 */
 	private $scopes;
