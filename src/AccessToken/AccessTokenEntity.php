@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken;
 
@@ -79,7 +80,7 @@ class AccessTokenEntity implements AccessTokenEntityInterface
 	/**
 	 * @return bool
 	 */
-	public function isRevoked()
+	public function isRevoked(): bool
 	{
 		return $this->revoked;
 	}
@@ -87,7 +88,7 @@ class AccessTokenEntity implements AccessTokenEntityInterface
 	/**
 	 * @param bool $revoked
 	 */
-	public function setRevoked($revoked)
+	public function setRevoked(bool $revoked)
 	{
 		$this->revoked = $revoked;
 	}

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine;
 
@@ -39,12 +40,12 @@ class TablePrefixListener implements Subscriber
 		$metadata = $eventArgs->getClassMetadata();
 		if (in_array($metadata->getName(), self::ENTITIES)) {
 			$metadata->setPrimaryTable([
-				'name' => $this->prefix . $metadata->getTableName(),
+				'name' => self::getPrefixedName($this->prefix, $metadata->getTableName()),
 			]);
 
 			foreach ($metadata->getAssociationMappings() as $name => $mapping) {
 				if ($mapping['type'] === ClassMetadataInfo::MANY_TO_MANY && $mapping['isOwningSide']) {
-					$metadata->associationMappings[$name]['joinTable']['name'] = $this->prefix . $mapping['joinTable']['name'];
+					$metadata->associationMappings[$name]['joinTable']['name'] = self::getPrefixedName($this->prefix, $mapping['joinTable']['name']);
 				}
 			}
 		}
@@ -56,5 +57,15 @@ class TablePrefixListener implements Subscriber
 	public function getSubscribedEvents()
 	{
 		return [Events::loadClassMetadata];
+	}
+
+	/**
+	 * @param string $prefix
+	 * @param string $name
+	 * @return string
+	 */
+	protected static function getPrefixedName(string $prefix, string $name): string
+	{
+		return $prefix . $name;
 	}
 }

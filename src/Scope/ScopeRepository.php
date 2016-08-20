@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope;
 
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
+use Kdyby\Doctrine\QueryObject;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
@@ -35,7 +37,7 @@ class ScopeRepository implements ScopeRepositoryInterface
 	 */
 	public function getScopeEntityByIdentifier($identifier)
 	{
-		return $this->repository->fetchOne((new ScopeQuery())->byIdentifier($identifier));
+		return $this->repository->fetchOne($this->createQuery()->byIdentifier($identifier));
 	}
 
 	/**
@@ -53,5 +55,13 @@ class ScopeRepository implements ScopeRepositoryInterface
 	)
 	{
 		return $scopes;
+	}
+
+	/**
+	 * @return QueryObject
+	 */
+	protected function createQuery(): QueryObject
+	{
+		return new ScopeQuery();
 	}
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine;
 
@@ -216,8 +217,9 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 	/**
 	 * @param string $interval
 	 * @return Statement
+	 * @throws \Exception
 	 */
-	private function createDateIntervalStatement(string $interval)
+	private function createDateIntervalStatement(string $interval): Statement
 	{
 		new \DateInterval($interval); // throw early
 		return new Statement(\DateInterval::class, [$interval]);

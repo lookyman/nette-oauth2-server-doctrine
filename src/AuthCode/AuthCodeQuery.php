@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode;
 
@@ -17,7 +18,7 @@ class AuthCodeQuery extends QueryObject
 	 * @param string $identifier
 	 * @return self
 	 */
-	public function byIdentifier($identifier)
+	public function byIdentifier(string $identifier): AuthCodeQuery
 	{
 		$this->filters[] = function (QueryBuilder $queryBuilder) use ($identifier) {
 			$queryBuilder->andWhere('ac.identifier = :identifier')->setParameter('identifier', $identifier);
