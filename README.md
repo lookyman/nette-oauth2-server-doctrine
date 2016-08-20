@@ -69,6 +69,7 @@ oauth2:
     publicKey: /path/to/public.key
     approveDestination: Approve:
     loginDestination: Sign:in
+    tablePrefix: nette_oauth2_server_
 ```
 
 The `grants` section contains grants that you want to enable. By default they are all disabled, so you just have to enter those you want to use. Each value doesn't have to just be a boolean. You can specify a token TTL like this: `[ttl: PT1H]`. Two of the grants also have additional settings. The `Authorization Code` grant has the `authCodeTtl` option, and the `Implicit` grant has the `accessTokenTtl` option. In each of these cases, the format for specifying the intervals follows the format described [here](https://secure.php.net/manual/en/dateinterval.construct.php).
@@ -78,6 +79,8 @@ Next, you're going to need a pair of private/public keys. If you didn't skip ste
 Finally, if you are using either `Authorization Code` or `Implicit` grants, you need to setup the redirect destinations. These should be normal strings you would use in `$presenter->redirect()` method. The `approveDestination` is discussed in detail below in step 5. The `loginDestination` should point to the presenter/action where your application has it's login form.
 
 You can omit `approveDestination` and `loginDestination` options if you are not using `Authorization Code` or `Implicit` grants.
+
+The `tablePrefix` option lets you set the prefix for generated SQL tables. The default value is `nette_oauth2_server_`.
 
 ### 4. Update database schema
 

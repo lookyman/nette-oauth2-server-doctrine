@@ -13,7 +13,7 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="nette_oauth2_server_auth_code")
+ * @ORM\Table(name="auth_code")
  */
 class AuthCodeEntity implements AuthCodeEntityInterface
 {
@@ -64,7 +64,7 @@ class AuthCodeEntity implements AuthCodeEntityInterface
 
 	/**
 	 * @ORM\ManyToMany(targetEntity="Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity")
-	 * @ORM\JoinTable(name="nette_oauth2_server_auth_code_scope")
+	 * @ORM\JoinTable(name="auth_code_scope")
 	 * @var Collection of ScopeEntity
 	 */
 	private $scopes;

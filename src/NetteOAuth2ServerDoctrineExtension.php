@@ -3,6 +3,7 @@
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine;
 
 use Kdyby\Doctrine\DI\IEntityProvider;
+use Kdyby\Events\DI\EventsExtension;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
@@ -44,12 +45,19 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 		'publicKey' => null,
 		'approveDestination' => null,
 		'loginDestination' => null,
+		'tablePrefix' => 'nette_oauth2_server_',
 	];
 
 	public function loadConfiguration()
 	{
 		$builder = $this->getContainerBuilder();
 		$config = $this->validateConfig($this->defaults);
+
+		// Table mapping
+		Validators::assertField($config, 'tablePrefix', 'string');
+		$builder->addDefinition($this->prefix('tablePrefixListener'))
+			->setClass(TablePrefixListener::class, [$config['tablePrefix']])
+			->addTag(EventsExtension::TAG_SUBSCRIBER);
 
 		// Common repositories
 		$builder->addDefinition($this->prefix('repository.client'))
