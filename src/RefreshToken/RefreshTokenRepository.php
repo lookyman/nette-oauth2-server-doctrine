@@ -5,6 +5,7 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken;
 
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
+use Kdyby\Doctrine\QueryObject;
 use League\OAuth2\Server\Entities\RefreshTokenEntityInterface;
 use League\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
 
@@ -48,7 +49,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 	 */
 	public function revokeRefreshToken($tokenId)
 	{
-		$this->repository->fetchOne((new RefreshTokenQuery())->byIdentifier($tokenId))->setRevoked(true);
+		$this->repository->fetchOne($this->createQuery()->byIdentifier($tokenId))->setRevoked(true);
 		$this->entityManager->flush();
 	}
 
@@ -58,6 +59,14 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 	 */
 	public function isRefreshTokenRevoked($tokenId)
 	{
-		return $this->repository->fetchOne((new RefreshTokenQuery())->byIdentifier($tokenId))->isRevoked();
+		return $this->repository->fetchOne($this->createQuery()->byIdentifier($tokenId))->isRevoked();
+	}
+
+	/**
+	 * @return QueryObject
+	 */
+	protected function createQuery(): QueryObject
+	{
+		return new RefreshTokenQuery();
 	}
 }

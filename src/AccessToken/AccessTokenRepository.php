@@ -5,6 +5,7 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken;
 
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
+use Kdyby\Doctrine\QueryObject;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
@@ -59,7 +60,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 	 */
 	public function revokeAccessToken($tokenId)
 	{
-		$this->repository->fetchOne((new AccessTokenQuery())->byIdentifier($tokenId))->setRevoked(true);
+		$this->repository->fetchOne($this->createQuery()->byIdentifier($tokenId))->setRevoked(true);
 		$this->entityManager->flush();
 	}
 
@@ -69,6 +70,14 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 	 */
 	public function isAccessTokenRevoked($tokenId)
 	{
-		return $this->repository->fetchOne((new AccessTokenQuery())->byIdentifier($tokenId))->isRevoked();
+		return $this->repository->fetchOne($this->createQuery()->byIdentifier($tokenId))->isRevoked();
+	}
+
+	/**
+	 * @return QueryObject
+	 */
+	protected function createQuery(): QueryObject
+	{
+		return new AccessTokenQuery();
 	}
 }

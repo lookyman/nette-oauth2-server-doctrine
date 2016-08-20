@@ -5,6 +5,7 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode;
 
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
+use Kdyby\Doctrine\QueryObject;
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
 use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
 
@@ -48,7 +49,7 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
 	 */
 	public function revokeAuthCode($codeId)
 	{
-		$this->repository->fetchOne((new AuthCodeQuery())->byIdentifier($codeId))->setRevoked(true);
+		$this->repository->fetchOne($this->createQuery()->byIdentifier($codeId))->setRevoked(true);
 		$this->entityManager->flush();
 	}
 
@@ -58,6 +59,14 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
 	 */
 	public function isAuthCodeRevoked($codeId)
 	{
-		return $this->repository->fetchOne((new AuthCodeQuery())->byIdentifier($codeId))->isRevoked();
+		return $this->repository->fetchOne($this->createQuery()->byIdentifier($codeId))->isRevoked();
+	}
+
+	/**
+	 * @return QueryObject
+	 */
+	protected function createQuery(): QueryObject
+	{
+		return new AuthCodeQuery();
 	}
 }
