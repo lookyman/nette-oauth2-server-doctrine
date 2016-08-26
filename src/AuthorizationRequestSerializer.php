@@ -3,20 +3,20 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine;
 
-use Doctrine\ORM\EntityManager;
+use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\RequestTypes\AuthorizationRequest;
 use Lookyman\NetteOAuth2Server\Storage\IAuthorizationRequestSerializer;
 
 class AuthorizationRequestSerializer implements IAuthorizationRequestSerializer
 {
 	/**
-	 * @var EntityManager
+	 * @var Registry
 	 */
-	private $entityManager;
+	private $registry;
 
-	public function __construct(EntityManager $entityManager)
+	public function __construct(Registry $registry)
 	{
-		$this->entityManager = $entityManager;
+		$this->registry = $registry;
 	}
 
 	/**
@@ -25,11 +25,12 @@ class AuthorizationRequestSerializer implements IAuthorizationRequestSerializer
 	 */
 	public function serialize(AuthorizationRequest $authorizationRequest): string
 	{
+		$manager = $this->registry->getManager();
 		if ($authorizationRequest->getClient()) {
-			$this->entityManager->detach($authorizationRequest->getClient());
+			$manager->detach($authorizationRequest->getClient());
 		}
 		foreach ($authorizationRequest->getScopes() as $scope) {
-			$this->entityManager->detach($scope);
+			$manager->detach($scope);
 		}
 		return serialize($authorizationRequest);
 	}
@@ -40,14 +41,15 @@ class AuthorizationRequestSerializer implements IAuthorizationRequestSerializer
 	 */
 	public function unserialize(string $data): AuthorizationRequest
 	{
+		$manager = $this->registry->getManager();
 		/** @var AuthorizationRequest $authorizationRequest */
 		$authorizationRequest = unserialize($data);
 		if ($authorizationRequest->getClient()) {
-			$authorizationRequest->setClient($this->entityManager->merge($authorizationRequest->getClient()));
+			$authorizationRequest->setClient($manager->merge($authorizationRequest->getClient()));
 		}
 		$scopes = [];
 		foreach ($authorizationRequest->getScopes() as $scope) {
-			$scopes[] = $this->entityManager->merge($scope);
+			$scopes[] = $manager->merge($scope);
 		}
 		$authorizationRequest->setScopes($scopes);
 		return $authorizationRequest;

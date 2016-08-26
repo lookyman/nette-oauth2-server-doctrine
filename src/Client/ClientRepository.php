@@ -3,23 +3,16 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Client;
 
-use Kdyby\Doctrine\EntityManager;
-use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Doctrine\QueryObject;
-use League\OAuth2\Server\Entities\ClientEntityInterface;
+use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 
 class ClientRepository implements ClientRepositoryInterface
 {
 	/**
-	 * @var EntityManager
+	 * @var Registry
 	 */
-	private $entityManager;
-
-	/**
-	 * @var EntityRepository
-	 */
-	private $repository;
+	private $registry;
 
 	/**
 	 * @var callable
@@ -27,13 +20,12 @@ class ClientRepository implements ClientRepositoryInterface
 	private $secretValidator;
 
 	/**
-	 * @param EntityManager $entityManager
+	 * @param Registry $registry
 	 * @param callable|null $secretValidator
 	 */
-	public function __construct(EntityManager $entityManager, callable $secretValidator = null)
+	public function __construct(Registry $registry, callable $secretValidator = null)
 	{
-		$this->entityManager = $entityManager;
-		$this->repository = $entityManager->getRepository(ClientEntity::class);
+		$this->registry = $registry;
 		$this->secretValidator = $secretValidator ?: function ($expected, $actual) { return hash_equals($expected, $actual); };
 	}
 
@@ -42,18 +34,18 @@ class ClientRepository implements ClientRepositoryInterface
 	 * @param string $grantType
 	 * @param string|null $clientSecret
 	 * @param bool $mustValidateSecret
-	 * @return ClientEntityInterface|null
+	 * @return ClientEntity|null
 	 */
 	public function getClientEntity($clientIdentifier, $grantType, $clientSecret = null, $mustValidateSecret = true)
 	{
-		/** @var ClientEntity|null $client */
-		$client = $this->repository->fetchOne($this->createQuery()->byIdentifier($clientIdentifier));
-		return $client
-			&& $client->getSecret()
+		/** @var ClientEntity|null $clientEntity */
+		$clientEntity = $this->registry->getManager()->getRepository(ClientEntity::class)->fetchOne($this->createQuery()->byIdentifier($clientIdentifier));
+		return $clientEntity
+			&& $clientEntity->getSecret() !== null
 			&& $mustValidateSecret
-			&& !call_user_func($this->secretValidator, $client->getSecret(), $clientSecret)
+			&& !call_user_func($this->secretValidator, $clientEntity->getSecret(), $clientSecret)
 			? null
-			: $client;
+			: $clientEntity;
 	}
 
 	/**

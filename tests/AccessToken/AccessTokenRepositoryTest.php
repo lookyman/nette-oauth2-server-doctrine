@@ -6,6 +6,7 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\AccessToken;
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Doctrine\QueryObject;
+use Kdyby\Doctrine\Registry;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken\AccessTokenEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken\AccessTokenQuery;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken\AccessTokenRepository;
@@ -17,7 +18,7 @@ class AccessTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 {
 	public function testGetNewToken()
 	{
-		$repository = new AccessTokenRepository($this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock());
+		$repository = new AccessTokenRepository($this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock());
 		$token = $repository->getNewToken($client = new ClientEntity(), [$scope = new ScopeEntity()], 'uid');
 
 		self::assertInstanceOf(AccessTokenEntity::class, $token);
@@ -36,7 +37,10 @@ class AccessTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		$manager->expects(self::once())->method('persist')->with($token);
 		$manager->expects(self::once())->method('flush');
 
-		$repository = new AccessTokenRepository($manager);
+		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
+		$registry->expects(self::once())->method('getManager')->willReturn($manager);
+
+		$repository = new AccessTokenRepository($registry);
 		$repository->persistNewAccessToken($token);
 	}
 
@@ -54,7 +58,10 @@ class AccessTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		$manager->expects(self::once())->method('getRepository')->with(AccessTokenEntity::class)->willReturn($entityRepo);
 		$manager->expects(self::once())->method('flush');
 
-		$repository = new AccessTokenRepositoryMock($query, $manager);
+		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
+		$registry->expects(self::once())->method('getManager')->willReturn($manager);
+
+		$repository = new AccessTokenRepositoryMock($query, $registry);
 		$repository->revokeAccessToken('id');
 
 		self::assertTrue($token->isRevoked());
@@ -74,7 +81,10 @@ class AccessTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		$manager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
 		$manager->expects(self::once())->method('getRepository')->with(AccessTokenEntity::class)->willReturn($entityRepo);
 
-		$repository = new AccessTokenRepositoryMock($query, $manager);
+		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
+		$registry->expects(self::once())->method('getManager')->willReturn($manager);
+
+		$repository = new AccessTokenRepositoryMock($query, $registry);
 		self::assertTrue($repository->isAccessTokenRevoked('id'));
 	}
 
@@ -82,7 +92,7 @@ class AccessTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 	{
 		$repository = new AccessTokenRepositoryMock(
 			$this->getMockBuilder(QueryObject::class)->disableOriginalConstructor()->getMock(),
-			$this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock()
+			$this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock()
 		);
 		self::assertInstanceOf(AccessTokenQuery::class, $repository->createQueryOriginal());
 	}

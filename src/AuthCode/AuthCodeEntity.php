@@ -173,7 +173,9 @@ class AuthCodeEntity implements AuthCodeEntityInterface
 	 */
 	public function setClient(ClientEntityInterface $client)
 	{
-		$this->client = $client;
+		if ($client instanceof ClientEntity) {
+			$this->client = $client;
+		}
 	}
 
 	/**
@@ -181,7 +183,7 @@ class AuthCodeEntity implements AuthCodeEntityInterface
 	 */
 	public function addScope(ScopeEntityInterface $scope)
 	{
-		if (!$this->scopes->contains($scope)) {
+		if ($scope instanceof ScopeEntity && !$this->scopes->contains($scope)) {
 			$this->scopes->add($scope);
 		}
 	}

@@ -6,6 +6,7 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\RefreshToken;
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Doctrine\QueryObject;
+use Kdyby\Doctrine\Registry;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenQuery;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenRepository;
@@ -15,7 +16,7 @@ class RefreshTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 {
 	public function testGetNewRefreshToken()
 	{
-		$repository = new RefreshTokenRepository($this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock());
+		$repository = new RefreshTokenRepository($this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock());
 		self::assertInstanceOf(RefreshTokenEntity::class, $repository->getNewRefreshToken());
 	}
 
@@ -27,7 +28,10 @@ class RefreshTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		$manager->expects(self::once())->method('persist')->with($token);
 		$manager->expects(self::once())->method('flush');
 
-		$repository = new RefreshTokenRepository($manager);
+		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
+		$registry->expects(self::once())->method('getManager')->willReturn($manager);
+
+		$repository = new RefreshTokenRepository($registry);
 		$repository->persistNewRefreshToken($token);
 	}
 
@@ -45,7 +49,10 @@ class RefreshTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		$manager->expects(self::once())->method('getRepository')->with(RefreshTokenEntity::class)->willReturn($entityRepo);
 		$manager->expects(self::once())->method('flush');
 
-		$repository = new RefreshTokenRepositoryMock($query, $manager);
+		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
+		$registry->expects(self::once())->method('getManager')->willReturn($manager);
+
+		$repository = new RefreshTokenRepositoryMock($query, $registry);
 		$repository->revokeRefreshToken('id');
 
 		self::assertTrue($token->isRevoked());
@@ -65,7 +72,10 @@ class RefreshTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		$manager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
 		$manager->expects(self::once())->method('getRepository')->with(RefreshTokenEntity::class)->willReturn($entityRepo);
 
-		$repository = new RefreshTokenRepositoryMock($query, $manager);
+		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
+		$registry->expects(self::once())->method('getManager')->willReturn($manager);
+
+		$repository = new RefreshTokenRepositoryMock($query, $registry);
 		self::assertTrue($repository->isRefreshTokenRevoked('id'));
 	}
 
@@ -73,7 +83,7 @@ class RefreshTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 	{
 		$repository = new RefreshTokenRepositoryMock(
 			$this->getMockBuilder(QueryObject::class)->disableOriginalConstructor()->getMock(),
-			$this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock()
+			$this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock()
 		);
 		self::assertInstanceOf(RefreshTokenQuery::class, $repository->createQueryOriginal());
 	}

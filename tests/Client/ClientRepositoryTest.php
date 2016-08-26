@@ -6,6 +6,7 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Client;
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Doctrine\QueryObject;
+use Kdyby\Doctrine\Registry;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientQuery;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock\ClientRepositoryMock;
@@ -26,8 +27,11 @@ class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
 		$manager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
 		$manager->expects(self::once())->method('getRepository')->with(ClientEntity::class)->willReturn($entityRepo);
 
+		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
+		$registry->expects(self::once())->method('getManager')->willReturn($manager);
+
 		$called = false;
-		$repository = new ClientRepositoryMock($query, $manager, function () use (&$called) { $called = true; });
+		$repository = new ClientRepositoryMock($query, $registry, function () use (&$called) { $called = true; });
 		self::assertSame($client, $repository->getClientEntity('id', 'grant', 'secret', false));
 		self::assertFalse($called);
 	}
@@ -46,7 +50,10 @@ class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
 		$manager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
 		$manager->expects(self::once())->method('getRepository')->with(ClientEntity::class)->willReturn($entityRepo);
 
-		$repository = new ClientRepositoryMock($query, $manager);
+		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
+		$registry->expects(self::once())->method('getManager')->willReturn($manager);
+
+		$repository = new ClientRepositoryMock($query, $registry);
 		self::assertSame($client, $repository->getClientEntity('id', 'grant', 'secret', true));
 	}
 
@@ -64,7 +71,10 @@ class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
 		$manager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
 		$manager->expects(self::once())->method('getRepository')->with(ClientEntity::class)->willReturn($entityRepo);
 
-		$repository = new ClientRepositoryMock($query, $manager, function () { return false; });
+		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
+		$registry->expects(self::once())->method('getManager')->willReturn($manager);
+
+		$repository = new ClientRepositoryMock($query, $registry, function () { return false; });
 		self::assertNull($repository->getClientEntity('id', 'grant', 'secret', true));
 	}
 
@@ -72,7 +82,7 @@ class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
 	{
 		$repository = new ClientRepositoryMock(
 			$this->getMockBuilder(QueryObject::class)->disableOriginalConstructor()->getMock(),
-			$this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock()
+			$this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock()
 		);
 		self::assertInstanceOf(ClientQuery::class, $repository->createQueryOriginal());
 	}
