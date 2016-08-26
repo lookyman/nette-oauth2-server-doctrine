@@ -16,11 +16,18 @@ class ScopeRepository implements ScopeRepositoryInterface
 	private $registry;
 
 	/**
-	 * @param Registry $registry
+	 * @var callable
 	 */
-	public function __construct(Registry $registry)
+	private $scopeFinalizer;
+
+	/**
+	 * @param Registry $registry
+	 * @param callable|null $scopeFinalizer
+	 */
+	public function __construct(Registry $registry, callable $scopeFinalizer = null)
 	{
 		$this->registry = $registry;
+		$this->scopeFinalizer = $scopeFinalizer ?: function (array $scopes) { return $scopes; };
 	}
 
 	/**
@@ -46,7 +53,7 @@ class ScopeRepository implements ScopeRepositoryInterface
 		$userIdentifier = null
 	)
 	{
-		return $scopes;
+		return call_user_func($this->scopeFinalizer, $scopes, $grantType, $clientEntity, $userIdentifier);
 	}
 
 	/**
