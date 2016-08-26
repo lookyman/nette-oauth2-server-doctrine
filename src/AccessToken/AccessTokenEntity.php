@@ -162,7 +162,9 @@ class AccessTokenEntity implements AccessTokenEntityInterface
 	 */
 	public function setClient(ClientEntityInterface $client)
 	{
-		$this->client = $client;
+		if ($client instanceof ClientEntity) {
+			$this->client = $client;
+		}
 	}
 
 	/**
@@ -170,7 +172,7 @@ class AccessTokenEntity implements AccessTokenEntityInterface
 	 */
 	public function addScope(ScopeEntityInterface $scope)
 	{
-		if (!$this->scopes->contains($scope)) {
+		if ($scope instanceof ScopeEntity && !$this->scopes->contains($scope)) {
 			$this->scopes->add($scope);
 		}
 	}

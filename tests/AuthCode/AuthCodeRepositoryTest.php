@@ -6,6 +6,7 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\AuthCode;
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Doctrine\QueryObject;
+use Kdyby\Doctrine\Registry;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode\AuthCodeEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode\AuthCodeQuery;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode\AuthCodeRepository;
@@ -15,7 +16,7 @@ class AuthCodeRepositoryTest extends \PHPUnit_Framework_TestCase
 {
 	public function testGetNewAuthCode()
 	{
-		$repository = new AuthCodeRepository($this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock());
+		$repository = new AuthCodeRepository($this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock());
 		self::assertInstanceOf(AuthCodeEntity::class, $repository->getNewAuthCode());
 	}
 
@@ -27,7 +28,10 @@ class AuthCodeRepositoryTest extends \PHPUnit_Framework_TestCase
 		$manager->expects(self::once())->method('persist')->with($code);
 		$manager->expects(self::once())->method('flush');
 
-		$repository = new AuthCodeRepository($manager);
+		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
+		$registry->expects(self::once())->method('getManager')->willReturn($manager);
+
+		$repository = new AuthCodeRepository($registry);
 		$repository->persistNewAuthCode($code);
 	}
 
@@ -45,7 +49,10 @@ class AuthCodeRepositoryTest extends \PHPUnit_Framework_TestCase
 		$manager->expects(self::once())->method('getRepository')->with(AuthCodeEntity::class)->willReturn($entityRepo);
 		$manager->expects(self::once())->method('flush');
 
-		$repository = new AuthCodeRepositoryMock($query, $manager);
+		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
+		$registry->expects(self::once())->method('getManager')->willReturn($manager);
+
+		$repository = new AuthCodeRepositoryMock($query, $registry);
 		$repository->revokeAuthCode('id');
 
 		self::assertTrue($code->isRevoked());
@@ -65,7 +72,10 @@ class AuthCodeRepositoryTest extends \PHPUnit_Framework_TestCase
 		$manager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
 		$manager->expects(self::once())->method('getRepository')->with(AuthCodeEntity::class)->willReturn($entityRepo);
 
-		$repository = new AuthCodeRepositoryMock($query, $manager);
+		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
+		$registry->expects(self::once())->method('getManager')->willReturn($manager);
+
+		$repository = new AuthCodeRepositoryMock($query, $registry);
 		self::assertTrue($repository->isAuthCodeRevoked('id'));
 	}
 
@@ -73,7 +83,7 @@ class AuthCodeRepositoryTest extends \PHPUnit_Framework_TestCase
 	{
 		$repository = new AuthCodeRepositoryMock(
 			$this->getMockBuilder(QueryObject::class)->disableOriginalConstructor()->getMock(),
-			$this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock()
+			$this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock()
 		);
 		self::assertInstanceOf(AuthCodeQuery::class, $repository->createQueryOriginal());
 	}

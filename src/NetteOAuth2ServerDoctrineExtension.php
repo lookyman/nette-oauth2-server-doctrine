@@ -68,7 +68,7 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 		$builder->addDefinition($this->prefix('repository.scope'))
 			->setClass(ScopeRepository::class);
 
-		// Private & public keys
+		// Encryption keys
 		Validators::assertField($config, 'publicKey', 'string');
 		Validators::assertField($config, 'privateKey', 'string|array');
 		if (is_array($config['privateKey'])) {

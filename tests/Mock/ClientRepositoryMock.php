@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock;
 
-use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\QueryObject;
+use Kdyby\Doctrine\Registry;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientRepository;
 
 class ClientRepositoryMock extends ClientRepository
@@ -16,12 +16,12 @@ class ClientRepositoryMock extends ClientRepository
 
 	/**
 	 * @param QueryObject $query
-	 * @param EntityManager $entityManager
+	 * @param Registry $registry
 	 * @param callable|null $secretValidator
 	 */
-	public function __construct(QueryObject $query, EntityManager $entityManager, callable $secretValidator = null)
+	public function __construct(QueryObject $query, Registry $registry, callable $secretValidator = null)
 	{
-		parent::__construct($entityManager, $secretValidator);
+		parent::__construct($registry, $secretValidator);
 		$this->query = $query;
 	}
 

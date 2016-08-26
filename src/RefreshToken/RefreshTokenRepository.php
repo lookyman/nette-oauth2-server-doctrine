@@ -3,28 +3,24 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken;
 
-use Kdyby\Doctrine\EntityManager;
-use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Doctrine\QueryObject;
+use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\Entities\RefreshTokenEntityInterface;
 use League\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
 
 class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 {
 	/**
-	 * @var EntityManager
+	 * @var Registry
 	 */
-	private $entityManager;
+	private $registry;
 
 	/**
-	 * @var EntityRepository
+	 * @param Registry $registry
 	 */
-	private $repository;
-
-	public function __construct(EntityManager $entityManager)
+	public function __construct(Registry $registry)
 	{
-		$this->entityManager = $entityManager;
-		$this->repository = $entityManager->getRepository(RefreshTokenEntity::class);
+		$this->registry = $registry;
 	}
 
 	/**
@@ -40,8 +36,11 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 	 */
 	public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity)
 	{
-		$this->entityManager->persist($refreshTokenEntity);
-		$this->entityManager->flush();
+		if ($refreshTokenEntity instanceof RefreshTokenEntity) {
+			$manager = $this->registry->getManager();
+			$manager->persist($refreshTokenEntity);
+			$manager->flush();
+		}
 	}
 
 	/**
@@ -49,8 +48,12 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 	 */
 	public function revokeRefreshToken($tokenId)
 	{
-		$this->repository->fetchOne($this->createQuery()->byIdentifier($tokenId))->setRevoked(true);
-		$this->entityManager->flush();
+		$manager = $this->registry->getManager();
+		/** @var RefreshTokenEntity|null $refreshTokenEntity */
+		if ($refreshTokenEntity = $manager->getRepository(RefreshTokenEntity::class)->fetchOne($this->createQuery()->byIdentifier($tokenId))) {
+			$refreshTokenEntity->setRevoked(true);
+			$manager->flush();
+		}
 	}
 
 	/**
@@ -59,7 +62,9 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 	 */
 	public function isRefreshTokenRevoked($tokenId)
 	{
-		return $this->repository->fetchOne($this->createQuery()->byIdentifier($tokenId))->isRevoked();
+		/** @var RefreshTokenEntity $refreshTokenEntity */
+		$refreshTokenEntity = $this->registry->getManager()->getRepository(RefreshTokenEntity::class)->fetchOne($this->createQuery()->byIdentifier($tokenId));
+		return $refreshTokenEntity ? $refreshTokenEntity->isRevoked() : true;
 	}
 
 	/**

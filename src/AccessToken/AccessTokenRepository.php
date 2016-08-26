@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken;
 
-use Kdyby\Doctrine\EntityManager;
-use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Doctrine\QueryObject;
+use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
@@ -14,19 +13,16 @@ use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 class AccessTokenRepository implements AccessTokenRepositoryInterface
 {
 	/**
-	 * @var EntityManager
+	 * @var Registry
 	 */
-	private $entityManager;
+	private $registry;
 
 	/**
-	 * @var EntityRepository
+	 * @param Registry $registry
 	 */
-	private $repository;
-
-	public function __construct(EntityManager $entityManager)
+	public function __construct(Registry $registry)
 	{
-		$this->entityManager = $entityManager;
-		$this->repository = $entityManager->getRepository(AccessTokenEntity::class);
+		$this->registry = $registry;
 	}
 
 	/**
@@ -51,8 +47,11 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 	 */
 	public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity)
 	{
-		$this->entityManager->persist($accessTokenEntity);
-		$this->entityManager->flush();
+		if ($accessTokenEntity instanceof AccessTokenEntity) {
+			$manager = $this->registry->getManager();
+			$manager->persist($accessTokenEntity);
+			$manager->flush();
+		}
 	}
 
 	/**
@@ -60,8 +59,12 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 	 */
 	public function revokeAccessToken($tokenId)
 	{
-		$this->repository->fetchOne($this->createQuery()->byIdentifier($tokenId))->setRevoked(true);
-		$this->entityManager->flush();
+		$manager = $this->registry->getManager();
+		/** @var AccessTokenEntity|null $accessTokenEntity */
+		if ($accessTokenEntity = $manager->getRepository(AccessTokenEntity::class)->fetchOne($this->createQuery()->byIdentifier($tokenId))) {
+			$accessTokenEntity->setRevoked(true);
+			$manager->flush();
+		}
 	}
 
 	/**
@@ -70,7 +73,9 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 	 */
 	public function isAccessTokenRevoked($tokenId)
 	{
-		return $this->repository->fetchOne($this->createQuery()->byIdentifier($tokenId))->isRevoked();
+		/** @var AccessTokenEntity|null $accessTokenEntity */
+		$accessTokenEntity = $this->registry->getManager()->getRepository(AccessTokenEntity::class)->fetchOne($this->createQuery()->byIdentifier($tokenId));
+		return $accessTokenEntity ? $accessTokenEntity->isRevoked() : true;
 	}
 
 	/**

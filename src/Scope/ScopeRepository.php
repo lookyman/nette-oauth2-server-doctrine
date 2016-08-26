@@ -3,49 +3,41 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope;
 
-use Kdyby\Doctrine\EntityManager;
-use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Doctrine\QueryObject;
+use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
-use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 
 class ScopeRepository implements ScopeRepositoryInterface
 {
 	/**
-	 * @var EntityManager
+	 * @var Registry
 	 */
-	private $entityManager;
+	private $registry;
 
 	/**
-	 * @var EntityRepository
+	 * @param Registry $registry
 	 */
-	private $repository;
-
-	/**
-	 * @param EntityManager $entityManager
-	 */
-	public function __construct(EntityManager $entityManager)
+	public function __construct(Registry $registry)
 	{
-		$this->entityManager = $entityManager;
-		$this->repository = $entityManager->getRepository(ScopeEntity::class);
+		$this->registry = $registry;
 	}
 
 	/**
 	 * @param string $identifier
-	 * @return ScopeEntityInterface
+	 * @return ScopeEntity|null
 	 */
 	public function getScopeEntityByIdentifier($identifier)
 	{
-		return $this->repository->fetchOne($this->createQuery()->byIdentifier($identifier));
+		return $this->registry->getManager()->getRepository(ScopeEntity::class)->fetchOne($this->createQuery()->byIdentifier($identifier));
 	}
 
 	/**
-	 * @param array $scopes
+	 * @param ScopeEntity[] $scopes
 	 * @param string $grantType
 	 * @param ClientEntityInterface $clientEntity
 	 * @param string|null $userIdentifier
-	 * @return ScopeEntityInterface[]
+	 * @return ScopeEntity[]
 	 */
 	public function finalizeScopes(
 		array $scopes,

@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock;
 
-use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\QueryObject;
+use Kdyby\Doctrine\Registry;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken\AccessTokenRepository;
 
 class AccessTokenRepositoryMock extends AccessTokenRepository
@@ -16,11 +16,11 @@ class AccessTokenRepositoryMock extends AccessTokenRepository
 
 	/**
 	 * @param QueryObject $query
-	 * @param EntityManager $entityManager
+	 * @param Registry $registry
 	 */
-	public function __construct(QueryObject $query, EntityManager $entityManager)
+	public function __construct(QueryObject $query, Registry $registry)
 	{
-		parent::__construct($entityManager);
+		parent::__construct($registry);
 		$this->query = $query;
 	}
 

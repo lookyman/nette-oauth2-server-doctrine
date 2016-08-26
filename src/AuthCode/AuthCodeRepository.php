@@ -3,32 +3,28 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode;
 
-use Kdyby\Doctrine\EntityManager;
-use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Doctrine\QueryObject;
+use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
 use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
 
 class AuthCodeRepository implements AuthCodeRepositoryInterface
 {
 	/**
-	 * @var EntityManager
+	 * @var Registry
 	 */
-	private $entityManager;
+	private $registry;
 
 	/**
-	 * @var EntityRepository
+	 * @param Registry $registry
 	 */
-	private $repository;
-
-	public function __construct(EntityManager $entityManager)
+	public function __construct(Registry $registry)
 	{
-		$this->entityManager = $entityManager;
-		$this->repository = $entityManager->getRepository(AuthCodeEntity::class);
+		$this->registry = $registry;
 	}
 
 	/**
-	 * @return AuthCodeEntityInterface
+	 * @return AuthCodeEntity
 	 */
 	public function getNewAuthCode()
 	{
@@ -40,8 +36,11 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
 	 */
 	public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity)
 	{
-		$this->entityManager->persist($authCodeEntity);
-		$this->entityManager->flush();
+		if ($authCodeEntity instanceof AuthCodeEntity) {
+			$manager = $this->registry->getManager();
+			$manager->persist($authCodeEntity);
+			$manager->flush();
+		}
 	}
 
 	/**
@@ -49,8 +48,12 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
 	 */
 	public function revokeAuthCode($codeId)
 	{
-		$this->repository->fetchOne($this->createQuery()->byIdentifier($codeId))->setRevoked(true);
-		$this->entityManager->flush();
+		$manager = $this->registry->getManager();
+		/** @var AuthCodeEntity|null $authCodeEntity */
+		if ($authCodeEntity = $manager->getRepository(AuthCodeEntity::class)->fetchOne($this->createQuery()->byIdentifier($codeId))) {
+			$authCodeEntity->setRevoked(true);
+			$manager->flush();
+		}
 	}
 
 	/**
@@ -59,7 +62,9 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
 	 */
 	public function isAuthCodeRevoked($codeId)
 	{
-		return $this->repository->fetchOne($this->createQuery()->byIdentifier($codeId))->isRevoked();
+		/** @var AuthCodeEntity|null $authCodeEntity */
+		$authCodeEntity = $this->registry->getManager()->getRepository(AuthCodeEntity::class)->fetchOne($this->createQuery()->byIdentifier($codeId));
+		return $authCodeEntity ? $authCodeEntity->isRevoked() : true;
 	}
 
 	/**
