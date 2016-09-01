@@ -26,6 +26,14 @@ class ScopeEntity implements ScopeEntityInterface
 	 */
 	private $identifier;
 
+	/**
+	 * @return int|null
+	 */
+	public function getId()
+	{
+		return $this->id;
+	}
+
 	public function __clone()
 	{
 		$this->id = null;

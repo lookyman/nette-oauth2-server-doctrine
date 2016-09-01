@@ -12,6 +12,15 @@ class RefreshTokenEntityTest extends \PHPUnit_Framework_TestCase
 	{
 		$entity = new RefreshTokenEntity();
 		self::assertFalse($entity->isRevoked());
+
+		self::assertNull($entity->getId());
+		$ref = new \ReflectionProperty($entity, 'id');
+		$ref->setAccessible(true);
+		$ref->setValue($entity, 1);
+		self::assertEquals(1, $entity->getId());
+
+		$cloned = clone $entity;
+		self::assertNull($cloned->getId());
 	}
 
 	public function testRevoked()
