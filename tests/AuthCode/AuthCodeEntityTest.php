@@ -15,6 +15,15 @@ class AuthCodeEntityTest extends \PHPUnit_Framework_TestCase
 		self::assertFalse($entity->isRevoked());
 		self::assertInternalType('array', $entity->getScopes());
 		self::assertCount(0, $entity->getScopes());
+
+		self::assertNull($entity->getId());
+		$ref = new \ReflectionProperty($entity, 'id');
+		$ref->setAccessible(true);
+		$ref->setValue($entity, 1);
+		self::assertEquals(1, $entity->getId());
+
+		$cloned = clone $entity;
+		self::assertNull($cloned->getId());
 	}
 
 	public function testRevoked()

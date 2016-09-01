@@ -72,6 +72,14 @@ class AccessTokenEntity implements AccessTokenEntityInterface
 		$this->scopes = new ArrayCollection();
 	}
 
+	/**
+	 * @return int|null
+	 */
+	public function getId()
+	{
+		return $this->id;
+	}
+
 	public function __clone()
 	{
 		$this->id = null;
