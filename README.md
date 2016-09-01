@@ -13,19 +13,19 @@ Integration of [The League of Extraordinary Packages](https://thephpleague.com)'
 Installation
 ------------
 
-### 0. The boring part
+### The boring part
 
 Read [this](https://oauth2.thephpleague.com). All of it. Seriously, don't just skip it and then come back complaining that something doesn't work.
 
 Don't forget to install and configure [Kdyby/Doctrine](https://github.com/Kdyby/Doctrine) if you haven't already.
 
-### 1. Install using [Composer](https://getcomposer.org/):
+### Install using [Composer](https://getcomposer.org/):
 
 ```sh
 composer require lookyman/nette-oauth2-server-doctrine
 ```
 
-### 2. Setup routes
+### Setup routes
 
 Depending on which grants you want to support, you will have to setup routes to either `access_token`, `authorize`, or both endpoints.
 
@@ -52,7 +52,7 @@ class RouterFactory
 
 You can then access those endpoints via `https://myapp.com/oauth2/access-token` and `https://myapp.com/oauth2/authorize` URLs respectively.
 
-### 3. Config
+### Config
 
 ```neon
 extensions:
@@ -74,7 +74,7 @@ oauth2:
 
 The `grants` section contains grants that you want to enable. By default they are all disabled, so you just have to enter those you want to use. Each value doesn't have to just be a boolean. You can specify a token TTL like this: `[ttl: PT1H]`. Two of the grants also have additional settings. The `Authorization Code` grant has the `authCodeTtl` option, and the `Implicit` grant has the `accessTokenTtl` option. In each of these cases, the format for specifying the intervals follows the format described [here](https://secure.php.net/manual/en/dateinterval.construct.php).
 
-Next, you're going to need a pair of private/public keys. If you didn't skip step 0 you should know how to do that. If you did, now is the time. Go read it, come back when you have the keys, and enter the paths in the `privateKey` and `publicKey` options. If your private key is protected with a passphrase, specify it like this: `privateKey: [keyPath: /path/to/private.key, passPhrase: passphrase]`
+Next, you're going to need a pair of private/public keys. If you didn't skip the first step you should know how to do that. If you did, now is the time. Go read it, come back when you have the keys, and enter the paths in the `privateKey` and `publicKey` options. If your private key is protected with a passphrase, specify it like this: `privateKey: [keyPath: /path/to/private.key, passPhrase: passphrase]`
 
 Finally, if you are using either `Authorization Code` or `Implicit` grants, you need to setup the redirect destinations. These should be normal strings you would use in `$presenter->redirect()` method. The `approveDestination` is discussed in detail below in step 5. The `loginDestination` should point to the presenter/action where your application has it's login form.
 
@@ -82,7 +82,7 @@ You can omit `approveDestination` and `loginDestination` options if you are not 
 
 The `tablePrefix` option lets you set the prefix for generated SQL tables. The default value is `nette_oauth2_server_`.
 
-### 4. Update database schema
+### Update database schema
 
 ```sh
 php www/index.php orm:schema-tool:update --force
@@ -100,7 +100,7 @@ It will generate 7 new tables in the database:
 - `nette_oauth2_server_refresh_token`
 - `nette_oauth2_server_scope`
 
-### 5. Implement traits
+### Implement traits
 
 The last part (and the most fun one) is to hook this all up into your application. For this there's a bunch of handy traits ready, so the process should be fairly smooth. Also, this step is only necessary if you want to use `Authorization Code` or `Implicit` grants, so if you don't, you are already done. Yay!
 
@@ -291,3 +291,39 @@ services:
     oauth2.repository.user:
         arguments: [credentialsValidator: @CredentialsValidator]
 ```
+
+### [RFC 7636](https://tools.ietf.org/html/rfc7636)
+
+Enable support for PKCE in `Authorization Code` grant like this:
+
+```neon
+services:
+    oauth2.grant.authCode:
+        setup:
+            - enableCodeExchangeProof
+```
+
+### Modifying scopes
+
+Just before an access token is issued, you can modify the requested scopes. By default the token is issued with exactly the same scopes that were requested, but you can change that with a custom finalizer:
+
+```php
+class ScopeFinalizer
+{
+    public function __invoke(array $scopes, string $grantType, ClientEntityInterface $clientEntity, $userIdentifier)
+    {
+        return $scopes; // this is the default behavior
+    }
+}
+```
+
+Then register it in the config:
+
+```neon
+services:
+    - ScopeFinalizer
+    oauth2.repository.scope:
+        arguments: [scopeFinalizer: @ScopeFinalizer]
+```
+
+This applies only to the `Authorization Code`, `Client Credentials`, and `Password` grants.
