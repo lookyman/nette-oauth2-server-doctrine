@@ -14,6 +14,9 @@ class AuthorizationRequestSerializer implements IAuthorizationRequestSerializer
 	 */
 	private $registry;
 
+	/**
+	 * @param Registry $registry
+	 */
 	public function __construct(Registry $registry)
 	{
 		$this->registry = $registry;
