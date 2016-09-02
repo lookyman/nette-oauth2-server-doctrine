@@ -29,11 +29,17 @@ class TablePrefixListener implements Subscriber
 	 */
 	private $prefix;
 
+	/**
+	 * @param string $prefix
+	 */
 	public function __construct(string $prefix)
 	{
 		$this->prefix = $prefix;
 	}
 
+	/**
+	 * @param LoadClassMetadataEventArgs $eventArgs
+	 */
 	public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
 	{
 		/** @var ClassMetadata $metadata */
@@ -42,11 +48,13 @@ class TablePrefixListener implements Subscriber
 			$metadata->setPrimaryTable([
 				'name' => self::getPrefixedName($this->prefix, $metadata->getTableName()),
 			]);
-
-			foreach ($metadata->getAssociationMappings() as $name => $mapping) {
-				if ($mapping['type'] === ClassMetadataInfo::MANY_TO_MANY && $mapping['isOwningSide']) {
-					$metadata->associationMappings[$name]['joinTable']['name'] = self::getPrefixedName($this->prefix, $mapping['joinTable']['name']);
-				}
+		}
+		foreach ($metadata->getAssociationMappings() as $name => $mapping) {
+			if ($mapping['type'] === ClassMetadataInfo::MANY_TO_MANY
+				&& $mapping['isOwningSide']
+				&& in_array($mapping['targetEntity'], self::ENTITIES)
+			) {
+				$metadata->associationMappings[$name]['joinTable']['name'] = self::getPrefixedName($this->prefix, $mapping['joinTable']['name']);
 			}
 		}
 	}
