@@ -47,8 +47,8 @@ class AuthorizationRequestSerializer implements IAuthorizationRequestSerializer
 		$manager = $this->registry->getManager();
 		/** @var AuthorizationRequest $authorizationRequest */
 		$authorizationRequest = unserialize($data);
-		if ($authorizationRequest->getClient()) {
-			$authorizationRequest->setClient($manager->merge($authorizationRequest->getClient()));
+		if ($client = $authorizationRequest->getClient()) {
+			$authorizationRequest->setClient($manager->merge($client));
 		}
 		$scopes = [];
 		foreach ($authorizationRequest->getScopes() as $scope) {
