@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken;
 
-use Kdyby\Doctrine\QueryObject;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMInvalidArgumentException;
+use Kdyby\Doctrine\InvalidStateException;
+use Kdyby\Doctrine\QueryException;
 use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\Entities\RefreshTokenEntityInterface;
 use League\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
@@ -33,6 +36,8 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 
 	/**
 	 * @param RefreshTokenEntityInterface $refreshTokenEntity
+	 * @throws ORMInvalidArgumentException
+	 * @throws OptimisticLockException
 	 */
 	public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity)
 	{
@@ -45,6 +50,9 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 
 	/**
 	 * @param string $tokenId
+	 * @throws InvalidStateException
+	 * @throws QueryException
+	 * @throws OptimisticLockException
 	 */
 	public function revokeRefreshToken($tokenId)
 	{
@@ -59,6 +67,8 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 	/**
 	 * @param string $tokenId
 	 * @return bool
+	 * @throws InvalidStateException
+	 * @throws QueryException
 	 */
 	public function isRefreshTokenRevoked($tokenId)
 	{
@@ -68,9 +78,9 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 	}
 
 	/**
-	 * @return QueryObject
+	 * @return RefreshTokenQuery
 	 */
-	protected function createQuery(): QueryObject
+	protected function createQuery(): RefreshTokenQuery
 	{
 		return new RefreshTokenQuery();
 	}

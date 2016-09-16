@@ -22,11 +22,12 @@ oauth2:
 		implicit: on
 		password: on
 		refreshToken: on
-	privateKey: %appDir%/keys/private.key
+	privateKey:
+		keyPath: %appDir%/keys/private.key
+		passPhrase: foobar
 	publicKey: %appDir%/keys/public.key
 	approveDestination: Foo:bar
 	loginDestination: Bar:foo
-	tablePrefix: test_
 
 services:
 	- Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock\LoggerMock
@@ -37,3 +38,5 @@ services:
 	oauth2.grant.authCode:
 		setup:
 			- enableCodeExchangeProof
+	oauth2.tablePrefixSubscriber:
+		arguments: [prefix: test_]

@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode;
 
-use Kdyby\Doctrine\QueryObject;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMInvalidArgumentException;
+use Kdyby\Doctrine\InvalidStateException;
+use Kdyby\Doctrine\QueryException;
 use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
 use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
@@ -33,6 +36,8 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
 
 	/**
 	 * @param AuthCodeEntityInterface $authCodeEntity
+	 * @throws ORMInvalidArgumentException
+	 * @throws OptimisticLockException
 	 */
 	public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity)
 	{
@@ -45,6 +50,9 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
 
 	/**
 	 * @param string $codeId
+	 * @throws InvalidStateException
+	 * @throws QueryException
+	 * @throws OptimisticLockException
 	 */
 	public function revokeAuthCode($codeId)
 	{
@@ -59,6 +67,8 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
 	/**
 	 * @param string $codeId
 	 * @return bool
+	 * @throws InvalidStateException
+	 * @throws QueryException
 	 */
 	public function isAuthCodeRevoked($codeId)
 	{
@@ -68,9 +78,9 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
 	}
 
 	/**
-	 * @return QueryObject
+	 * @return AuthCodeQuery
 	 */
-	protected function createQuery(): QueryObject
+	protected function createQuery(): AuthCodeQuery
 	{
 		return new AuthCodeQuery();
 	}

@@ -22,10 +22,10 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeRepository;
 use Lookyman\NetteOAuth2Server\Storage\IAuthorizationRequestSerializer;
 use Lookyman\NetteOAuth2Server\UI\ApproveControlFactory;
 use Lookyman\NetteOAuth2Server\UI\OAuth2Presenter;
+use Lookyman\NetteOAuth2Server\User\LoginSubscriber;
 use Lookyman\NetteOAuth2Server\User\UserRepository;
 use Nette\Application\IPresenterFactory;
 use Nette\DI\CompilerExtension;
-use Nette\DI\ContainerBuilder;
 use Nette\DI\Statement;
 use Nette\Utils\Validators;
 
@@ -46,7 +46,6 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 		'publicKey' => null,
 		'approveDestination' => null,
 		'loginDestination' => null,
-		'tablePrefix' => 'nette_oauth2_server_',
 	];
 
 	public function loadConfiguration()
@@ -54,19 +53,27 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 		$builder = $this->getContainerBuilder();
 		$config = $this->validateConfig($this->defaults);
 
-		// Table mapping
-		Validators::assertField($config, 'tablePrefix', 'string');
-		$builder->addDefinition($this->prefix('tablePrefixListener'))
-			->setClass(TablePrefixListener::class, [$config['tablePrefix']])
+		// Table mapping & Login redirection
+		$builder->addDefinition($this->prefix('tablePrefixSubscriber'))
+			->setClass(TablePrefixSubscriber::class)
+			->addTag(EventsExtension::TAG_SUBSCRIBER);
+		$builder->addDefinition($this->prefix('loginSubscriber'))
+			->setClass(LoginSubscriber::class)
 			->addTag(EventsExtension::TAG_SUBSCRIBER);
 
 		// Common repositories
-		$builder->addDefinition($this->prefix('repository.client'))
-			->setClass(ClientRepository::class);
 		$builder->addDefinition($this->prefix('repository.accessToken'))
 			->setClass(AccessTokenRepository::class);
+		$builder->addDefinition($this->prefix('repository.authCode'))
+			->setClass(AuthCodeRepository::class);
+		$builder->addDefinition($this->prefix('repository.client'))
+			->setClass(ClientRepository::class);
+		$builder->addDefinition($this->prefix('repository.refreshToken'))
+			->setClass(RefreshTokenRepository::class);
 		$builder->addDefinition($this->prefix('repository.scope'))
 			->setClass(ScopeRepository::class);
+		$builder->addDefinition($this->prefix('repository.user'))
+			->setClass(UserRepository::class);
 
 		// Encryption keys
 		Validators::assertField($config, 'publicKey', 'string');
@@ -91,8 +98,6 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 				'publicKey' => $config['publicKey'],
 			]);
 
-		$enableAuthorizeEndpoint = false;
-
 		// Grants
 		Validators::assertField($config, 'grants', 'array');
 		foreach ($config['grants'] as $grant => $options) {
@@ -112,11 +117,6 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 						$options['authCodeTtl'] = 'PT10M';
 					}
 					$definition->setClass(AuthCodeGrant::class, ['authCodeTTL' => $this->createDateIntervalStatement($options['authCodeTtl'])]);
-					$builder->addDefinition($this->prefix('repository.authCode'))
-						->setClass(AuthCodeRepository::class);
-					$this->registerRefreshTokenRepository($builder);
-					$this->registerUserRepository($builder);
-					$enableAuthorizeEndpoint = true;
 					break;
 				case 'clientCredentials':
 					$definition->setClass(ClientCredentialsGrant::class);
@@ -126,17 +126,12 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 						$options['accessTokenTtl'] = 'PT10M';
 					}
 					$definition->setClass(ImplicitGrant::class, ['accessTokenTTL' => $this->createDateIntervalStatement($options['accessTokenTtl'])]);
-					$this->registerUserRepository($builder);
-					$enableAuthorizeEndpoint = true;
 					break;
 				case 'password':
 					$definition->setClass(PasswordGrant::class);
-					$this->registerRefreshTokenRepository($builder);
-					$this->registerUserRepository($builder);
 					break;
 				case 'refreshToken':
 					$definition->setClass(RefreshTokenGrant::class);
-					$this->registerRefreshTokenRepository($builder);
 					break;
 				default:
 					throw new \InvalidArgumentException(sprintf('Unknown grant %s', $grant));
@@ -149,28 +144,23 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 			$authorizationServer->addSetup('enableGrantType', $args);
 		}
 
-		// Presenter
-		$presenter = $builder->addDefinition($this->prefix('presenter'))
+		// Presenter, Control factory, Serializer
+		$builder->addDefinition($this->prefix('presenter'))
 			->setClass(OAuth2Presenter::class);
+		$builder->addDefinition($this->prefix('approveControlFactory'))
+			->setClass(ApproveControlFactory::class);
+		$builder->addDefinition($this->prefix('serializer'))
+			->setClass(IAuthorizationRequestSerializer::class)
+			->setFactory(AuthorizationRequestSerializer::class);
 
-		if ($enableAuthorizeEndpoint) {
-			$builder->addDefinition($this->prefix('serializer'))
-				->setClass(IAuthorizationRequestSerializer::class)
-				->setFactory(AuthorizationRequestSerializer::class);
-			$builder->addDefinition($this->prefix('approveControlFactory'))
-				->setClass(ApproveControlFactory::class);
-
-			Validators::assertField($config, 'approveDestination', 'string');
-			Validators::assertField($config, 'loginDestination', 'string');
-			$builder->addDefinition($this->prefix('redirectConfig'))
-				->setClass(RedirectConfig::class, [
-					'approveDestination' => $config['approveDestination'],
-					'loginDestination' => $config['loginDestination'],
-				]);
-
-			$presenter->addSetup('setRedirectConfig')
-				->addSetup('setAuthorizationRequestSerializer');
-		}
+		// Redirect config
+		Validators::assertField($config, 'approveDestination', 'string|null');
+		Validators::assertField($config, 'loginDestination', 'string|null');
+		$builder->addDefinition($this->prefix('redirectConfig'))
+			->setClass(RedirectConfig::class, [
+				'approveDestination' => $config['approveDestination'],
+				'loginDestination' => $config['loginDestination'],
+			]);
 	}
 
 	public function beforeCompile()
@@ -190,28 +180,6 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 	public function getEntityMappings()
 	{
 		return ['Lookyman\NetteOAuth2Server\Storage\Doctrine' => __DIR__];
-	}
-
-	/**
-	 * @param ContainerBuilder $builder
-	 */
-	private function registerRefreshTokenRepository(ContainerBuilder $builder)
-	{
-		if (!$builder->hasDefinition($this->prefix('repository.refreshToken'))) {
-			$builder->addDefinition($this->prefix('repository.refreshToken'))
-				->setClass(RefreshTokenRepository::class);
-		}
-	}
-
-	/**
-	 * @param ContainerBuilder $builder
-	 */
-	private function registerUserRepository(ContainerBuilder $builder)
-	{
-		if (!$builder->hasDefinition($this->prefix('repository.user'))) {
-			$builder->addDefinition($this->prefix('repository.user'))
-				->setClass(UserRepository::class);
-		}
 	}
 
 	/**

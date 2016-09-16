@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken;
 
-use Kdyby\Doctrine\QueryObject;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMInvalidArgumentException;
+use Kdyby\Doctrine\InvalidStateException;
+use Kdyby\Doctrine\QueryException;
 use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
@@ -44,6 +47,8 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 
 	/**
 	 * @param AccessTokenEntityInterface $accessTokenEntity
+	 * @throws ORMInvalidArgumentException
+	 * @throws OptimisticLockException
 	 */
 	public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity)
 	{
@@ -56,6 +61,9 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 
 	/**
 	 * @param string $tokenId
+	 * @throws InvalidStateException
+	 * @throws QueryException
+	 * @throws OptimisticLockException
 	 */
 	public function revokeAccessToken($tokenId)
 	{
@@ -70,6 +78,8 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 	/**
 	 * @param string $tokenId
 	 * @return bool
+	 * @throws InvalidStateException
+	 * @throws QueryException
 	 */
 	public function isAccessTokenRevoked($tokenId)
 	{
@@ -79,9 +89,9 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 	}
 
 	/**
-	 * @return QueryObject
+	 * @return AccessTokenQuery
 	 */
-	protected function createQuery(): QueryObject
+	protected function createQuery(): AccessTokenQuery
 	{
 		return new AccessTokenQuery();
 	}
