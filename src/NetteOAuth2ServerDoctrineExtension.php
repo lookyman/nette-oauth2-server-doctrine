@@ -72,7 +72,7 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 		Validators::assertField($config, 'publicKey', 'string');
 		Validators::assertField($config, 'privateKey', 'string|array');
 		if (is_array($config['privateKey'])) {
-			Validators::assertField($config['privateKey'], 'kayPath', 'string');
+			Validators::assertField($config['privateKey'], 'keyPath', 'string');
 			Validators::assertField($config['privateKey'], 'passPhrase', 'string');
 			$privateKey = new Statement(CryptKey::class, [$config['privateKey']['keyPath'], $config['privateKey']['passPhrase']]);
 
