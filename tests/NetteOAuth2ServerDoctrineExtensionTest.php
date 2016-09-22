@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests;
 
 use Kdyby\Doctrine\Events;
+use Kdyby\Events\DI\EventsExtension;
 use Kdyby\Events\EventManager;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
@@ -12,12 +13,22 @@ use League\OAuth2\Server\Grant\ImplicitGrant;
 use League\OAuth2\Server\Grant\PasswordGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
+use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
+use League\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
+use League\OAuth2\Server\Repositories\UserRepositoryInterface;
 use League\OAuth2\Server\ResourceServer;
+use Lookyman\NetteOAuth2Server\RedirectConfig;
+use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthorizationRequestSerializer;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\NetteOAuth2ServerDoctrineExtension;
-use Lookyman\NetteOAuth2Server\Storage\Doctrine\TablePrefixListener;
+use Lookyman\NetteOAuth2Server\Storage\Doctrine\TablePrefixSubscriber;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock\CustomGrantMock;
+use Lookyman\NetteOAuth2Server\Storage\IAuthorizationRequestSerializer;
+use Lookyman\NetteOAuth2Server\UI\ApproveControlFactory;
+use Lookyman\NetteOAuth2Server\UI\IApproveControlFactory;
+use Lookyman\NetteOAuth2Server\UI\OAuth2Presenter;
+use Lookyman\NetteOAuth2Server\User\LoginSubscriber;
 use Nette\Configurator;
 use Nette\DI\Container;
 
@@ -27,8 +38,8 @@ class NetteOAuth2ServerDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 	{
 		$container = $this->createContainer();
 
-		/** @var TablePrefixListener $tablePrefixListener */
-		$tablePrefixListener = $container->getByType(TablePrefixListener::class);
+		/** @var TablePrefixSubscriber $tablePrefixListener */
+		$tablePrefixListener = $container->getByType(TablePrefixSubscriber::class);
 		$ref = new \ReflectionProperty($tablePrefixListener, 'prefix');
 		$ref->setAccessible(true);
 		self::assertEquals('test_', $ref->getValue($tablePrefixListener));
@@ -37,9 +48,12 @@ class NetteOAuth2ServerDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 		$listeners = $eventManager->getListeners(Events::loadClassMetadata);
 		self::assertSame($tablePrefixListener, array_pop($listeners));
 
-		$container->getByType(ClientRepositoryInterface::class);
 		$container->getByType(AccessTokenRepositoryInterface::class);
+		$container->getByType(AuthCodeRepositoryInterface::class);
+		$container->getByType(ClientRepositoryInterface::class);
+		$container->getByType(RefreshTokenRepositoryInterface::class);
 		$container->getByType(ScopeRepositoryInterface::class);
+		$container->getByType(UserRepositoryInterface::class);
 
 		/** @var AuthorizationServer $authorizationServer */
 		$authorizationServer = $container->getByType(AuthorizationServer::class);
@@ -73,7 +87,23 @@ class NetteOAuth2ServerDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 		self::assertArrayHasKey('refresh_token', $grants);
 		self::assertArrayHasKey('custom', $grants);
 
-		// todo
+		$container->getByType(LoginSubscriber::class);
+
+		$subscribers = $container->findByTag(EventsExtension::TAG_SUBSCRIBER);
+		self::assertArrayHasKey('oauth2.loginSubscriber', $subscribers);
+		self::assertArrayHasKey('oauth2.tablePrefixSubscriber', $subscribers);
+		self::assertInstanceOf(LoginSubscriber::class, $container->getService('oauth2.loginSubscriber'));
+		self::assertInstanceOf(TablePrefixSubscriber::class, $container->getService('oauth2.tablePrefixSubscriber'));
+
+		self::assertInstanceOf(OAuth2Presenter::class, $container->getByType(OAuth2Presenter::class));
+		self::assertInstanceOf(ApproveControlFactory::class, $container->getByType(IApproveControlFactory::class));
+		self::assertInstanceOf(AuthorizationRequestSerializer::class, $container->getByType(IAuthorizationRequestSerializer::class));
+
+		/** @var RedirectConfig $redirectConfig */
+		$redirectConfig = $container->getByType(RedirectConfig::class);
+		self::assertInstanceOf(RedirectConfig::class, $redirectConfig);
+		self::assertEquals(['Foo:bar'], $redirectConfig->getApproveDestination());
+		self::assertEquals(['Bar:foo'], $redirectConfig->getLoginDestination());
 	}
 
 	public function testGetEntityMappings()

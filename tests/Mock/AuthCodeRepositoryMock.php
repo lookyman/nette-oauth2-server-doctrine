@@ -3,39 +3,39 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock;
 
-use Kdyby\Doctrine\QueryObject;
 use Kdyby\Doctrine\Registry;
+use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode\AuthCodeQuery;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode\AuthCodeRepository;
 
 class AuthCodeRepositoryMock extends AuthCodeRepository
 {
 	/**
-	 * @var QueryObject
+	 * @var AuthCodeQuery
 	 */
 	private $query;
 
 	/**
-	 * @param QueryObject $query
+	 * @param AuthCodeQuery $query
 	 * @param Registry $registry
 	 */
-	public function __construct(QueryObject $query, Registry $registry)
+	public function __construct(AuthCodeQuery $query, Registry $registry)
 	{
 		parent::__construct($registry);
 		$this->query = $query;
 	}
 
 	/**
-	 * @return QueryObject
+	 * @return AuthCodeQuery
 	 */
-	protected function createQuery(): QueryObject
+	protected function createQuery(): AuthCodeQuery
 	{
 		return $this->query;
 	}
 
 	/**
-	 * @return QueryObject
+	 * @return AuthCodeQuery
 	 */
-	public function createQueryOriginal(): QueryObject
+	public function createQueryOriginal(): AuthCodeQuery
 	{
 		return parent::createQuery();
 	}

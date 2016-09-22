@@ -5,7 +5,6 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\RefreshToken;
 
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
-use Kdyby\Doctrine\QueryObject;
 use Kdyby\Doctrine\Registry;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenQuery;
@@ -82,7 +81,7 @@ class RefreshTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 	public function testCreateQuery()
 	{
 		$repository = new RefreshTokenRepositoryMock(
-			$this->getMockBuilder(QueryObject::class)->disableOriginalConstructor()->getMock(),
+			$this->getMockBuilder(RefreshTokenQuery::class)->disableOriginalConstructor()->getMock(),
 			$this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock()
 		);
 		self::assertInstanceOf(RefreshTokenQuery::class, $repository->createQueryOriginal());

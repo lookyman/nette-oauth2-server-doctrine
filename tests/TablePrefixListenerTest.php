@@ -12,13 +12,13 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode\AuthCodeEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
-use Lookyman\NetteOAuth2Server\Storage\Doctrine\TablePrefixListener;
+use Lookyman\NetteOAuth2Server\Storage\Doctrine\TablePrefixSubscriber;
 
 class TablePrefixListenerTest extends \PHPUnit_Framework_TestCase
 {
 	public function testGetSubscribedEvents()
 	{
-		$listener = new TablePrefixListener('');
+		$listener = new TablePrefixSubscriber('');
 		self::assertEquals([Events::loadClassMetadata], $listener->getSubscribedEvents());
 	}
 
@@ -36,12 +36,12 @@ class TablePrefixListenerTest extends \PHPUnit_Framework_TestCase
 		$eventArgs = $this->getMockBuilder(LoadClassMetadataEventArgs::class)->disableOriginalConstructor()->getMock();
 		$eventArgs->expects(self::once())->method('getClassMetadata')->willReturn($metadata);
 
-		$listener = new TablePrefixListener('prefix_');
+		$listener = new TablePrefixSubscriber('prefix_');
 		$listener->loadClassMetadata($eventArgs);
 
-		self::assertEquals(in_array($entityName, TablePrefixListener::ENTITIES) ? 'prefix_table' : 'table', $metadata->table['name']);
+		self::assertEquals(in_array($entityName, TablePrefixSubscriber::ENTITIES) ? 'prefix_table' : 'table', $metadata->table['name']);
 		if (isset($metadata->associationMappings['foo']['targetEntity'])
-			&& in_array($metadata->associationMappings['foo']['targetEntity'], TablePrefixListener::ENTITIES)
+			&& in_array($metadata->associationMappings['foo']['targetEntity'], TablePrefixSubscriber::ENTITIES)
 		) {
 			self::assertEquals('prefix_join_table', $metadata->associationMappings['foo']['joinTable']['name']);
 		}

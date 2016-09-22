@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Client;
 
-use Kdyby\Doctrine\QueryObject;
+use Kdyby\Doctrine\InvalidStateException;
+use Kdyby\Doctrine\QueryException;
 use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 
@@ -35,23 +36,25 @@ class ClientRepository implements ClientRepositoryInterface
 	 * @param string|null $clientSecret
 	 * @param bool $mustValidateSecret
 	 * @return ClientEntity|null
+	 * @throws InvalidStateException
+	 * @throws QueryException
 	 */
 	public function getClientEntity($clientIdentifier, $grantType, $clientSecret = null, $mustValidateSecret = true)
 	{
 		/** @var ClientEntity|null $clientEntity */
 		$clientEntity = $this->registry->getManager()->getRepository(ClientEntity::class)->fetchOne($this->createQuery()->byIdentifier($clientIdentifier));
 		return $clientEntity
-			&& $clientEntity->getSecret() !== null
 			&& $mustValidateSecret
+			&& $clientEntity->getSecret() !== null
 			&& !call_user_func($this->secretValidator, $clientEntity->getSecret(), $clientSecret)
 			? null
 			: $clientEntity;
 	}
 
 	/**
-	 * @return QueryObject
+	 * @return ClientQuery
 	 */
-	protected function createQuery(): QueryObject
+	protected function createQuery(): ClientQuery
 	{
 		return new ClientQuery();
 	}

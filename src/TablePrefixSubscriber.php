@@ -14,8 +14,10 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
 
-class TablePrefixListener implements Subscriber
+class TablePrefixSubscriber implements Subscriber
 {
+	const DEFAULT_PREFIX = 'nette_oauth2_server_';
+
 	const ENTITIES = [
 		AccessTokenEntity::class,
 		AuthCodeEntity::class,
@@ -32,7 +34,7 @@ class TablePrefixListener implements Subscriber
 	/**
 	 * @param string $prefix
 	 */
-	public function __construct(string $prefix)
+	public function __construct(string $prefix = self::DEFAULT_PREFIX)
 	{
 		$this->prefix = $prefix;
 	}

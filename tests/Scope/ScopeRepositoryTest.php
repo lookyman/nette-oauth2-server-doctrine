@@ -5,7 +5,6 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Scope;
 
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
-use Kdyby\Doctrine\QueryObject;
 use Kdyby\Doctrine\Registry;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
@@ -48,7 +47,7 @@ class ScopeRepositoryTest extends \PHPUnit_Framework_TestCase
 	public function testCreateQuery()
 	{
 		$repository = new ScopeRepositoryMock(
-			$this->getMockBuilder(QueryObject::class)->disableOriginalConstructor()->getMock(),
+			$this->getMockBuilder(ScopeQuery::class)->disableOriginalConstructor()->getMock(),
 			$this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock()
 		);
 		self::assertInstanceOf(ScopeQuery::class, $repository->createQueryOriginal());

@@ -5,7 +5,6 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\AccessToken;
 
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
-use Kdyby\Doctrine\QueryObject;
 use Kdyby\Doctrine\Registry;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken\AccessTokenEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken\AccessTokenQuery;
@@ -91,7 +90,7 @@ class AccessTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 	public function testCreateQuery()
 	{
 		$repository = new AccessTokenRepositoryMock(
-			$this->getMockBuilder(QueryObject::class)->disableOriginalConstructor()->getMock(),
+			$this->getMockBuilder(AccessTokenQuery::class)->disableOriginalConstructor()->getMock(),
 			$this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock()
 		);
 		self::assertInstanceOf(AccessTokenQuery::class, $repository->createQueryOriginal());

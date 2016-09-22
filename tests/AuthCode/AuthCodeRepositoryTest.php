@@ -5,7 +5,6 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\AuthCode;
 
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
-use Kdyby\Doctrine\QueryObject;
 use Kdyby\Doctrine\Registry;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode\AuthCodeEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode\AuthCodeQuery;
@@ -82,7 +81,7 @@ class AuthCodeRepositoryTest extends \PHPUnit_Framework_TestCase
 	public function testCreateQuery()
 	{
 		$repository = new AuthCodeRepositoryMock(
-			$this->getMockBuilder(QueryObject::class)->disableOriginalConstructor()->getMock(),
+			$this->getMockBuilder(AuthCodeQuery::class)->disableOriginalConstructor()->getMock(),
 			$this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock()
 		);
 		self::assertInstanceOf(AuthCodeQuery::class, $repository->createQueryOriginal());

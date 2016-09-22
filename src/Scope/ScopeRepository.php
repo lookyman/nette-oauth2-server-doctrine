@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope;
 
-use Kdyby\Doctrine\QueryObject;
+use Kdyby\Doctrine\InvalidStateException;
+use Kdyby\Doctrine\QueryException;
 use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
@@ -33,6 +34,8 @@ class ScopeRepository implements ScopeRepositoryInterface
 	/**
 	 * @param string $identifier
 	 * @return ScopeEntity|null
+	 * @throws InvalidStateException
+	 * @throws QueryException
 	 */
 	public function getScopeEntityByIdentifier($identifier)
 	{
@@ -57,9 +60,9 @@ class ScopeRepository implements ScopeRepositoryInterface
 	}
 
 	/**
-	 * @return QueryObject
+	 * @return ScopeQuery
 	 */
-	protected function createQuery(): QueryObject
+	protected function createQuery(): ScopeQuery
 	{
 		return new ScopeQuery();
 	}

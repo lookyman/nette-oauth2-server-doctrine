@@ -5,7 +5,6 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Client;
 
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
-use Kdyby\Doctrine\QueryObject;
 use Kdyby\Doctrine\Registry;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientQuery;
@@ -81,7 +80,7 @@ class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
 	public function testCreateQuery()
 	{
 		$repository = new ClientRepositoryMock(
-			$this->getMockBuilder(QueryObject::class)->disableOriginalConstructor()->getMock(),
+			$this->getMockBuilder(ClientQuery::class)->disableOriginalConstructor()->getMock(),
 			$this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock()
 		);
 		self::assertInstanceOf(ClientQuery::class, $repository->createQueryOriginal());
