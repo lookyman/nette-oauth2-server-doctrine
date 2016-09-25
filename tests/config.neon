@@ -17,8 +17,8 @@ extensions:
 
 oauth2:
 	grants:
-		authCode: on
-		clientCredentials: on
+		authCode: [pkce: on]
+		clientCredentials: [ttl: PT2H]
 		implicit: on
 		password: on
 		refreshToken: on
@@ -26,8 +26,10 @@ oauth2:
 		keyPath: %appDir%/keys/private.key
 		passPhrase: foobar
 	publicKey: %appDir%/keys/public.key
-	approveDestination: Foo:bar
-	loginDestination: Bar:foo
+	approveDestination: :Foo:bar
+	loginDestination: :Bar:foo
+	tablePrefix: test_
+	loginEventPriority: 1
 
 services:
 	- Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock\LoggerMock
@@ -35,8 +37,3 @@ services:
 	oauth2.authorizationServer:
 		setup:
 			- enableGrantType(@custom)
-	oauth2.grant.authCode:
-		setup:
-			- enableCodeExchangeProof
-	oauth2.tablePrefixSubscriber:
-		arguments: [prefix: test_]

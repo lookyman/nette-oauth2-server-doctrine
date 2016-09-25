@@ -69,15 +69,23 @@ oauth2:
     publicKey: /path/to/public.key
     approveDestination: :Approve:
     loginDestination: :Sign:in
+    tablePrefix: nette_oauth2_server_
+    loginEventPriority: 0
 ```
 
 The `grants` section contains grants that you want to enable. By default they are all disabled, so you just have to enter those you want to use. Each value doesn't have to just be a boolean. You can specify a token TTL like this: `[ttl: PT1H]`. Two of the grants also have additional settings. The `Authorization Code` grant has the `authCodeTtl` option, and the `Implicit` grant has the `accessTokenTtl` option. In each of these cases, the format for specifying the intervals follows the format described [here](https://secure.php.net/manual/en/dateinterval.construct.php).
 
+The `Authorization Code` grant also has another option to enable support for [RFC 7636](https://tools.ietf.org/html/rfc7636). You can turn it on by specifying `[pkce: on]`.
+
 Next, you're going to need a pair of private/public keys. If you didn't skip the first step you should know how to do that. If you did, now is the time. Go read it, come back when you have the keys, and enter the paths in the `privateKey` and `publicKey` options. If your private key is protected with a passphrase, specify it like this: `privateKey: [keyPath: /path/to/private.key, passPhrase: passphrase]`
 
-Finally, if you are using either `Authorization Code` or `Implicit` grants, you need to setup the redirect destinations. These should be normal strings you would use in `$presenter->redirect()` method. The `approveDestination` is discussed in detail below. The `loginDestination` should point to the presenter/action where your application has it's login form. Both paths should be absolute (with module).
+If you are using either `Authorization Code` or `Implicit` grants, you need to setup the redirect destinations. These should be normal strings you would use in `$presenter->redirect()` method. The `approveDestination` is discussed in detail below. The `loginDestination` should point to the presenter/action where your application has it's login form. Both paths should be absolute (with module).
 
 You can omit `approveDestination` and `loginDestination` options if you are not using `Authorization Code` or `Implicit` grants.
+
+The `tablePrefix` option lets you set the prefix for the generated tables. Default value is `nette_oauth2_server_`.
+
+Finally, when using `Authorization Code` or `Implicit` grants, the user is at some point redirected to the login page. This redirection is done by a subscriber listening for `Nette\Security\User::onLoggedIn` event, but if you already have some other subscribers listening on it, you might want to tweak the event priority. You can do it with the `loginEventPriority` option.
 
 ### Update database schema
 
@@ -263,17 +271,6 @@ services:
         arguments: [credentialsValidator: @CredentialsValidator]
 ```
 
-### [RFC 7636](https://tools.ietf.org/html/rfc7636)
-
-Enable support for PKCE in `Authorization Code` grant like this:
-
-```neon
-services:
-    oauth2.grant.authCode:
-        setup:
-            - enableCodeExchangeProof
-```
-
 ### Modifying scopes
 
 Just before an access token is issued, you can modify the requested scopes. By default the token is issued with exactly the same scopes that were requested, but you can change that with a custom finalizer:
@@ -295,24 +292,4 @@ services:
     - ScopeFinalizer
     oauth2.repository.scope:
         arguments: [scopeFinalizer: @ScopeFinalizer]
-```
-
-### Custom table prefix
-
-You can customize the prefix for the generated tables like this:
-
-```neon
-services:
-    oauth2.tablePrefixSubscriber:
-        arguments: [prefix: my_custom_prefix_]
-```
-
-### Login redirection event priority
-
-When using `Authorization Code` or `Implicit` grants, the user is at some point redirected to the login page. This redirection is done by a subscriber listening for `Nette\Security\User::onLoggedIn` event, but if you already have some other subscribers listening on it, you might want to tweak the event priority. You can do it like this:
-
-```neon
-services:
-    oauth2.loginSubscriber:
-        arguments: [priority: 100]
 ```

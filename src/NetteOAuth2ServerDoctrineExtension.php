@@ -46,6 +46,8 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 		'publicKey' => null,
 		'approveDestination' => null,
 		'loginDestination' => null,
+		'tablePrefix' => TablePrefixSubscriber::DEFAULT_PREFIX,
+		'loginEventPriority' => 0,
 	];
 
 	public function loadConfiguration()
@@ -54,11 +56,13 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 		$config = $this->validateConfig($this->defaults);
 
 		// Table mapping & Login redirection
+		Validators::assertField($config, 'tablePrefix', 'string');
 		$builder->addDefinition($this->prefix('tablePrefixSubscriber'))
-			->setClass(TablePrefixSubscriber::class)
+			->setClass(TablePrefixSubscriber::class, [$config['tablePrefix']])
 			->addTag(EventsExtension::TAG_SUBSCRIBER);
+		Validators::assertField($config, 'loginEventPriority', 'integer');
 		$builder->addDefinition($this->prefix('loginSubscriber'))
-			->setClass(LoginSubscriber::class)
+			->setClass(LoginSubscriber::class, ['priority' => $config['loginEventPriority']])
 			->addTag(EventsExtension::TAG_SUBSCRIBER);
 
 		// Common repositories
@@ -117,6 +121,12 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 						$options['authCodeTtl'] = 'PT10M';
 					}
 					$definition->setClass(AuthCodeGrant::class, ['authCodeTTL' => $this->createDateIntervalStatement($options['authCodeTtl'])]);
+					if (array_key_exists('pkce', $options)) {
+						Validators::assertField($options, 'pkce', 'boolean');
+						if ($options['pkce']) {
+							$definition->addSetup('enableCodeExchangeProof');
+						}
+					}
 					break;
 				case 'clientCredentials':
 					$definition->setClass(ClientCredentialsGrant::class);
