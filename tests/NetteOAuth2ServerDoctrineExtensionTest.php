@@ -102,8 +102,8 @@ class NetteOAuth2ServerDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 		/** @var RedirectConfig $redirectConfig */
 		$redirectConfig = $container->getByType(RedirectConfig::class);
 		self::assertInstanceOf(RedirectConfig::class, $redirectConfig);
-		self::assertEquals(['Foo:bar'], $redirectConfig->getApproveDestination());
-		self::assertEquals(['Bar:foo'], $redirectConfig->getLoginDestination());
+		self::assertEquals([':Foo:bar'], $redirectConfig->getApproveDestination());
+		self::assertEquals([':Bar:foo'], $redirectConfig->getLoginDestination());
 	}
 
 	public function testGetEntityMappings()
