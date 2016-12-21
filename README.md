@@ -54,7 +54,7 @@ You can then access those endpoints via `https://myapp.com/oauth2/access-token` 
 
 ### Config
 
-```neon
+```yaml
 extensions:
     oauth2: Lookyman\NetteOAuth2Server\Storage\Doctrine\NetteOAuth2ServerDoctrineExtension
     
@@ -205,7 +205,7 @@ The template gets passed a single variable `$authorizationRequest` with a `Leagu
 
 Custom grants have to implement `League\OAuth2\Server\Grant\GrantTypeInterface`. Enable them in your `config.neon` like this:
 
-```neon
+```yaml
 services:
     - MyCustomGrant
     oauth2.authorizationServer:
@@ -217,7 +217,7 @@ services:
 
 This package supports standard [PSR-3](http://www.php-fig.org/psr/psr-3) logging. If you have a compliant logger registered as a service, the easiest way to enable it is via `config.neon`:
 
-```neon
+```yaml
 decorator:
     Psr\Log\LoggerAwareInterface:
         setup:
@@ -240,7 +240,7 @@ class SecretValidator
 
 Then register it in the config:
 
-```neon
+```yaml
 services:
     - SecretValidator
     oauth2.repository.client:
@@ -264,7 +264,7 @@ class CredentialsValidator
 
 Then register it in the config:
 
-```neon
+```yaml
 services:
     - CredentialsValidator
     oauth2.repository.user:
@@ -287,7 +287,7 @@ class ScopeFinalizer
 
 Then register it in the config:
 
-```neon
+```yaml
 services:
     - ScopeFinalizer
     oauth2.repository.scope:
