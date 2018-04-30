@@ -6,10 +6,12 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\AccessToken;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken\AccessTokenEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
+use PHPUnit\Framework\TestCase;
 
-class AccessTokenEntityTest extends \PHPUnit_Framework_TestCase
+class AccessTokenEntityTest extends TestCase
 {
-	public function testDefaults()
+
+	public function testDefaults(): void
 	{
 		$entity = new AccessTokenEntity();
 		self::assertFalse($entity->isRevoked());
@@ -26,35 +28,35 @@ class AccessTokenEntityTest extends \PHPUnit_Framework_TestCase
 		self::assertNull($cloned->getId());
 	}
 
-	public function testRevoked()
+	public function testRevoked(): void
 	{
 		$entity = new AccessTokenEntity();
 		$entity->setRevoked(true);
 		self::assertTrue($entity->isRevoked());
 	}
 
-	public function testClient()
+	public function testClient(): void
 	{
 		$entity = new AccessTokenEntity();
 		$entity->setClient($client = new ClientEntity());
 		self::assertSame($client, $entity->getClient());
 	}
 
-	public function testExpiryDateTime()
+	public function testExpiryDateTime(): void
 	{
 		$entity = new AccessTokenEntity();
 		$entity->setExpiryDateTime($dateTime = new \DateTime());
 		self::assertSame($dateTime, $entity->getExpiryDateTime());
 	}
 
-	public function testUserIdentifier()
+	public function testUserIdentifier(): void
 	{
 		$entity = new AccessTokenEntity();
 		$entity->setUserIdentifier('user');
 		self::assertEquals('user', $entity->getUserIdentifier());
 	}
 
-	public function testScope()
+	public function testScope(): void
 	{
 		$entity = new AccessTokenEntity();
 		$entity->addScope($scope = new ScopeEntity());
@@ -63,10 +65,11 @@ class AccessTokenEntityTest extends \PHPUnit_Framework_TestCase
 		self::assertSame($scope, array_pop($scopes));
 	}
 
-	public function testIdentifier()
+	public function testIdentifier(): void
 	{
 		$entity = new AccessTokenEntity();
 		$entity->setIdentifier('ident');
 		self::assertEquals('ident', $entity->getIdentifier());
 	}
+
 }

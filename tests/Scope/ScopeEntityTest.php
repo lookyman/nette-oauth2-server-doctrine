@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Scope;
 
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
+use PHPUnit\Framework\TestCase;
 
-class ScopeEntityTest extends \PHPUnit_Framework_TestCase
+class ScopeEntityTest extends TestCase
 {
-	public function testDefaults()
+
+	public function testDefaults(): void
 	{
 		$entity = new ScopeEntity();
 
@@ -21,17 +23,18 @@ class ScopeEntityTest extends \PHPUnit_Framework_TestCase
 		self::assertNull($cloned->getId());
 	}
 
-	public function testIdentifier()
+	public function testIdentifier(): void
 	{
 		$entity = new ScopeEntity();
 		$entity->setIdentifier('identifier');
 		self::assertEquals('identifier', $entity->getIdentifier());
 	}
 
-	public function testJsonSerialize()
+	public function testJsonSerialize(): void
 	{
 		$entity = new ScopeEntity();
 		$entity->setIdentifier('identifier');
 		self::assertEquals('"identifier"', json_encode($entity));
 	}
+
 }

@@ -9,28 +9,21 @@ use Kdyby\Persistence\Queryable;
 
 class AuthCodeQuery extends QueryObject
 {
+
 	/**
 	 * @var callable[]
 	 */
 	private $filters = [];
 
-	/**
-	 * @param string $identifier
-	 * @return self
-	 */
 	public function byIdentifier(string $identifier): AuthCodeQuery
 	{
-		$this->filters[] = function (QueryBuilder $queryBuilder) use ($identifier) {
+		$this->filters[] = function (QueryBuilder $queryBuilder) use ($identifier): void {
 			$queryBuilder->andWhere('ac.identifier = :identifier')->setParameter('identifier', $identifier);
 		};
 		return $this;
 	}
 
-	/**
-	 * @param Queryable $repository
-	 * @return QueryBuilder
-	 */
-	protected function doCreateQuery(Queryable $repository)
+	protected function doCreateQuery(Queryable $repository): QueryBuilder
 	{
 		$queryBuilder = $repository->createQueryBuilder()->select('ac')->from(AuthCodeEntity::class, 'ac');
 		foreach ($this->filters as $filter) {
@@ -38,4 +31,5 @@ class AuthCodeQuery extends QueryObject
 		}
 		return $queryBuilder;
 	}
+
 }

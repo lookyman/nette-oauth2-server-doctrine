@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Client;
 
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientEntity;
+use PHPUnit\Framework\TestCase;
 
-class ClientEntityTest extends \PHPUnit_Framework_TestCase
+class ClientEntityTest extends TestCase
 {
-	public function testDefaults()
+
+	public function testDefaults(): void
 	{
 		$entity = new ClientEntity();
 
@@ -21,31 +23,32 @@ class ClientEntityTest extends \PHPUnit_Framework_TestCase
 		self::assertNull($cloned->getId());
 	}
 
-	public function testSecret()
+	public function testSecret(): void
 	{
 		$entity = new ClientEntity();
 		$entity->setSecret('secret');
 		self::assertEquals('secret', $entity->getSecret());
 	}
 
-	public function testIdentifier()
+	public function testIdentifier(): void
 	{
 		$entity = new ClientEntity();
 		$entity->setIdentifier('identifier');
 		self::assertEquals('identifier', $entity->getIdentifier());
 	}
 
-	public function testName()
+	public function testName(): void
 	{
 		$entity = new ClientEntity();
 		$entity->setName('name');
 		self::assertEquals('name', $entity->getName());
 	}
 
-	public function testRedirectUri()
+	public function testRedirectUri(): void
 	{
 		$entity = new ClientEntity();
 		$entity->setRedirectUri('uri');
 		self::assertEquals('uri', $entity->getRedirectUri());
 	}
+
 }

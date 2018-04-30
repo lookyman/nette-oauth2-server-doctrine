@@ -9,10 +9,12 @@ use Kdyby\Doctrine\Registry;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientQuery;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock\ClientRepositoryMock;
+use PHPUnit\Framework\TestCase;
 
-class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
+class ClientRepositoryTest extends TestCase
 {
-	public function testGetClientEntityPublic()
+
+	public function testGetClientEntityPublic(): void
 	{
 		$client = new ClientEntity();
 		$client->setSecret('secret');
@@ -30,12 +32,14 @@ class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
 		$registry->expects(self::once())->method('getManager')->willReturn($manager);
 
 		$called = false;
-		$repository = new ClientRepositoryMock($query, $registry, function () use (&$called) { $called = true; });
+		$repository = new ClientRepositoryMock($query, $registry, function () use (&$called): void {
+			$called = true;
+		});
 		self::assertSame($client, $repository->getClientEntity('id', 'grant', 'secret', false));
 		self::assertFalse($called);
 	}
 
-	public function testGetClientEntityPrivateSuccess()
+	public function testGetClientEntityPrivateSuccess(): void
 	{
 		$client = new ClientEntity();
 		$client->setSecret('secret');
@@ -56,7 +60,7 @@ class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
 		self::assertSame($client, $repository->getClientEntity('id', 'grant', 'secret', true));
 	}
 
-	public function testGetClientEntityPrivateFail()
+	public function testGetClientEntityPrivateFail(): void
 	{
 		$client = new ClientEntity();
 		$client->setSecret('secret');
@@ -73,11 +77,13 @@ class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
 		$registry = $this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock();
 		$registry->expects(self::once())->method('getManager')->willReturn($manager);
 
-		$repository = new ClientRepositoryMock($query, $registry, function () { return false; });
+		$repository = new ClientRepositoryMock($query, $registry, function (): bool {
+			return false;
+		});
 		self::assertNull($repository->getClientEntity('id', 'grant', 'secret', true));
 	}
 
-	public function testCreateQuery()
+	public function testCreateQuery(): void
 	{
 		$repository = new ClientRepositoryMock(
 			$this->getMockBuilder(ClientQuery::class)->disableOriginalConstructor()->getMock(),
@@ -85,4 +91,5 @@ class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
 		);
 		self::assertInstanceOf(ClientQuery::class, $repository->createQueryOriginal());
 	}
+
 }

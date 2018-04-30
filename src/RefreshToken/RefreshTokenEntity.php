@@ -6,6 +6,7 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken;
 use Doctrine\ORM\Mapping as ORM;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\RefreshTokenEntityInterface;
+use Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken\AccessTokenEntity;
 
 /**
  * @ORM\Entity()
@@ -13,11 +14,12 @@ use League\OAuth2\Server\Entities\RefreshTokenEntityInterface;
  */
 class RefreshTokenEntity implements RefreshTokenEntityInterface
 {
+
 	/**
 	 * @ORM\Id()
 	 * @ORM\GeneratedValue()
 	 * @ORM\Column(type="integer")
-	 * @var int
+	 * @var int|null
 	 */
 	private $id;
 
@@ -41,14 +43,11 @@ class RefreshTokenEntity implements RefreshTokenEntityInterface
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken\AccessTokenEntity")
-	 * @var AccessToken;
+	 * @var AccessTokenEntity
 	 */
 	private $accessToken;
 
-	/**
-	 * @return int|null
-	 */
-	public function getId()
+	public function getId(): ?int
 	{
 		return $this->id;
 	}
@@ -58,67 +57,51 @@ class RefreshTokenEntity implements RefreshTokenEntityInterface
 		$this->id = null;
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function isRevoked(): bool
 	{
 		return $this->revoked;
 	}
 
-	/**
-	 * @param bool $revoked
-	 */
-	public function setRevoked(bool $revoked)
+	public function setRevoked(bool $revoked): void
 	{
 		$this->revoked = $revoked;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getIdentifier()
+	public function getIdentifier(): string
 	{
 		return $this->identifier;
 	}
 
 	/**
 	 * @param string $identifier
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function setIdentifier($identifier)
+	public function setIdentifier($identifier): void
 	{
 		$this->identifier = $identifier;
 	}
 
-	/**
-	 * @return \DateTime
-	 */
-	public function getExpiryDateTime()
+	public function getExpiryDateTime(): \DateTime
 	{
 		return $this->expiryDateTime;
 	}
 
-	/**
-	 * @param \DateTime $dateTime
-	 */
-	public function setExpiryDateTime(\DateTime $dateTime)
+	public function setExpiryDateTime(\DateTime $dateTime): void
 	{
 		$this->expiryDateTime = $dateTime;
 	}
 
 	/**
-	 * @param AccessTokenEntityInterface $accessToken
+	 * @param AccessTokenEntity $accessToken
 	 */
-	public function setAccessToken(AccessTokenEntityInterface $accessToken)
+	public function setAccessToken(AccessTokenEntityInterface $accessToken): void
 	{
 		$this->accessToken = $accessToken;
 	}
 
-	/**
-	 * @return AccessTokenEntityInterface
-	 */
-	public function getAccessToken()
+	public function getAccessToken(): AccessTokenEntityInterface
 	{
 		return $this->accessToken;
 	}
+
 }

@@ -12,11 +12,12 @@ use League\OAuth2\Server\Entities\ClientEntityInterface;
  */
 class ClientEntity implements ClientEntityInterface
 {
+
 	/**
 	 * @ORM\Id()
 	 * @ORM\GeneratedValue()
 	 * @ORM\Column(type="integer")
-	 * @var int
+	 * @var int|null
 	 */
 	private $id;
 
@@ -44,10 +45,7 @@ class ClientEntity implements ClientEntityInterface
 	 */
 	private $redirectUri;
 
-	/**
-	 * @return int|null
-	 */
-	public function getId()
+	public function getId(): ?int
 	{
 		return $this->id;
 	}
@@ -57,67 +55,48 @@ class ClientEntity implements ClientEntityInterface
 		$this->id = null;
 	}
 
-	/**
-	 * @return string|null
-	 */
-	public function getSecret()
+	public function getSecret(): ?string
 	{
 		return $this->secret;
 	}
 
 	/**
 	 * @param string|null $secret
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function setSecret($secret)
+	public function setSecret($secret): void
 	{
 		$this->secret = $secret;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getIdentifier()
+	public function getIdentifier(): string
 	{
 		return $this->identifier;
 	}
 
-	/**
-	 * @param string $identifier
-	 */
-	public function setIdentifier(string $identifier)
+	public function setIdentifier(string $identifier): void
 	{
 		$this->identifier = $identifier;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getName()
+	public function getName(): string
 	{
 		return $this->name;
 	}
 
-	/**
-	 * @param string $name
-	 */
-	public function setName(string $name)
+	public function setName(string $name): void
 	{
 		$this->name = $name;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getRedirectUri()
+	public function getRedirectUri(): string
 	{
 		return $this->redirectUri;
 	}
 
-	/**
-	 * @param string $uri
-	 */
-	public function setRedirectUri(string $uri)
+	public function setRedirectUri(string $uri): void
 	{
 		$this->redirectUri = $uri;
 	}
+
 }

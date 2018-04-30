@@ -18,11 +18,12 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
  */
 class AuthCodeEntity implements AuthCodeEntityInterface
 {
+
 	/**
 	 * @ORM\Id()
 	 * @ORM\GeneratedValue()
 	 * @ORM\Column(type="integer")
-	 * @var int
+	 * @var int|null
 	 */
 	private $id;
 
@@ -75,10 +76,7 @@ class AuthCodeEntity implements AuthCodeEntityInterface
 		$this->scopes = new ArrayCollection();
 	}
 
-	/**
-	 * @return int|null
-	 */
-	public function getId()
+	public function getId(): ?int
 	{
 		return $this->id;
 	}
@@ -88,108 +86,81 @@ class AuthCodeEntity implements AuthCodeEntityInterface
 		$this->id = null;
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function isRevoked(): bool
 	{
 		return $this->revoked;
 	}
 
-	/**
-	 * @param bool $revoked
-	 */
-	public function setRevoked(bool $revoked)
+	public function setRevoked(bool $revoked): void
 	{
 		$this->revoked = $revoked;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getRedirectUri()
+	public function getRedirectUri(): string
 	{
 		return $this->redirectUri;
 	}
 
 	/**
 	 * @param string $uri
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function setRedirectUri($uri)
+	public function setRedirectUri($uri): void
 	{
 		$this->redirectUri = (string) $uri;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getIdentifier()
+	public function getIdentifier(): string
 	{
 		return $this->identifier;
 	}
 
 	/**
 	 * @param string $identifier
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function setIdentifier($identifier)
+	public function setIdentifier($identifier): void
 	{
 		$this->identifier = $identifier;
 	}
 
-	/**
-	 * @return \DateTime
-	 */
-	public function getExpiryDateTime()
+	public function getExpiryDateTime(): \DateTime
 	{
 		return $this->expiryDateTime;
 	}
 
-	/**
-	 * @param \DateTime $dateTime
-	 */
-	public function setExpiryDateTime(\DateTime $dateTime)
+	public function setExpiryDateTime(\DateTime $dateTime): void
 	{
 		$this->expiryDateTime = $dateTime;
 	}
 
 	/**
 	 * @param string $identifier
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function setUserIdentifier($identifier)
+	public function setUserIdentifier($identifier): void
 	{
 		$this->userIdentifier = $identifier;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getUserIdentifier()
+	public function getUserIdentifier(): string
 	{
 		return $this->userIdentifier;
 	}
 
-	/**
-	 * @return ClientEntityInterface
-	 */
-	public function getClient()
+	public function getClient(): ClientEntityInterface
 	{
 		return $this->client;
 	}
 
-	/**
-	 * @param ClientEntityInterface $client
-	 */
-	public function setClient(ClientEntityInterface $client)
+	public function setClient(ClientEntityInterface $client): void
 	{
 		if ($client instanceof ClientEntity) {
 			$this->client = $client;
 		}
 	}
 
-	/**
-	 * @param ScopeEntityInterface $scope
-	 */
-	public function addScope(ScopeEntityInterface $scope)
+	public function addScope(ScopeEntityInterface $scope): void
 	{
 		if ($scope instanceof ScopeEntity && !$this->scopes->contains($scope)) {
 			$this->scopes->add($scope);
@@ -199,8 +170,9 @@ class AuthCodeEntity implements AuthCodeEntityInterface
 	/**
 	 * @return ScopeEntityInterface[]
 	 */
-	public function getScopes()
+	public function getScopes(): array
 	{
 		return $this->scopes->toArray();
 	}
+
 }

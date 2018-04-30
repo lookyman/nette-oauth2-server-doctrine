@@ -31,6 +31,7 @@ use Nette\Utils\Validators;
 
 class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IEntityProvider
 {
+
 	/**
 	 * @var array
 	 */
@@ -44,13 +45,14 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 		],
 		'privateKey' => null,
 		'publicKey' => null,
+		'encryptionKey' => null,
 		'approveDestination' => null,
 		'loginDestination' => null,
 		'tablePrefix' => TablePrefixSubscriber::DEFAULT_PREFIX,
 		'loginEventPriority' => 0,
 	];
 
-	public function loadConfiguration()
+	public function loadConfiguration(): void
 	{
 		$builder = $this->getContainerBuilder();
 		$config = $this->validateConfig($this->defaults);
@@ -80,6 +82,7 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 			->setClass(UserRepository::class);
 
 		// Encryption keys
+		Validators::assertField($config, 'encryptionKey', 'string');
 		Validators::assertField($config, 'publicKey', 'string');
 		Validators::assertField($config, 'privateKey', 'string|array');
 		if (is_array($config['privateKey'])) {
@@ -95,7 +98,7 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 		$authorizationServer = $builder->addDefinition($this->prefix('authorizationServer'))
 			->setClass(AuthorizationServer::class, [
 				'privateKey' => $privateKey,
-				'publicKey' => $config['publicKey'],
+				'encryptionKey' => $config['encryptionKey'],
 			]);
 		$builder->addDefinition($this->prefix('resourceServer'))
 			->setClass(ResourceServer::class, [
@@ -173,33 +176,31 @@ class NetteOAuth2ServerDoctrineExtension extends CompilerExtension implements IE
 			]);
 	}
 
-	public function beforeCompile()
+	public function beforeCompile(): void
 	{
 		$builder = $this->getContainerBuilder();
 
 		// Mapping
 		$presenterFactory = $builder->getDefinition($builder->getByType(IPresenterFactory::class));
 		$presenterFactory->addSetup('if (!? instanceof \Nette\Application\PresenterFactory) { throw new \RuntimeException(\'Cannot set OAuth2Server mapping\'); } else { ?->setMapping(?); }', [
-			'@self', '@self', ['NetteOAuth2Server' => 'Lookyman\NetteOAuth2Server\UI\*Presenter']
+			'@self',
+			'@self',
+			['NetteOAuth2Server' => 'Lookyman\NetteOAuth2Server\UI\*Presenter'],
 		]);
 	}
 
 	/**
-	 * @return array
+	 * @return string[]
 	 */
-	public function getEntityMappings()
+	public function getEntityMappings(): array
 	{
 		return ['Lookyman\NetteOAuth2Server\Storage\Doctrine' => __DIR__];
 	}
 
-	/**
-	 * @param string $interval
-	 * @return Statement
-	 * @throws \Exception
-	 */
 	private function createDateIntervalStatement(string $interval): Statement
 	{
 		new \DateInterval($interval); // throw early
 		return new Statement(\DateInterval::class, [$interval]);
 	}
+
 }

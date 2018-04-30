@@ -13,10 +13,12 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\TablePrefixSubscriber;
+use PHPUnit\Framework\TestCase;
 
-class TablePrefixListenerTest extends \PHPUnit_Framework_TestCase
+class TablePrefixListenerTest extends TestCase
 {
-	public function testGetSubscribedEvents()
+
+	public function testGetSubscribedEvents(): void
 	{
 		$listener = new TablePrefixSubscriber('');
 		self::assertEquals([Events::loadClassMetadata], $listener->getSubscribedEvents());
@@ -24,10 +26,9 @@ class TablePrefixListenerTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * @dataProvider loadClassMetadataProvider
-	 * @param string $entityName
 	 * @param array $associationMappings
 	 */
-	public function testLoadClassMetadata(string $entityName, array $associationMappings)
+	public function testLoadClassMetadata(string $entityName, array $associationMappings): void
 	{
 		$metadata = new ClassMetadata($entityName);
 		$metadata->table['name'] = 'table';
@@ -39,17 +40,14 @@ class TablePrefixListenerTest extends \PHPUnit_Framework_TestCase
 		$listener = new TablePrefixSubscriber('prefix_');
 		$listener->loadClassMetadata($eventArgs);
 
-		self::assertEquals(in_array($entityName, TablePrefixSubscriber::ENTITIES) ? 'prefix_table' : 'table', $metadata->table['name']);
+		self::assertEquals(in_array($entityName, TablePrefixSubscriber::ENTITIES, true) ? 'prefix_table' : 'table', $metadata->table['name']);
 		if (isset($metadata->associationMappings['foo']['targetEntity'])
-			&& in_array($metadata->associationMappings['foo']['targetEntity'], TablePrefixSubscriber::ENTITIES)
+			&& in_array($metadata->associationMappings['foo']['targetEntity'], TablePrefixSubscriber::ENTITIES, true)
 		) {
 			self::assertEquals('prefix_join_table', $metadata->associationMappings['foo']['joinTable']['name']);
 		}
 	}
 
-	/**
-	 * @return array
-	 */
 	public function loadClassMetadataProvider(): array
 	{
 		return [
@@ -86,4 +84,5 @@ class TablePrefixListenerTest extends \PHPUnit_Framework_TestCase
 			],
 		];
 	}
+
 }

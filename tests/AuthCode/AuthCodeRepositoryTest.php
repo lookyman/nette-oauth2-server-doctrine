@@ -10,16 +10,18 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode\AuthCodeEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode\AuthCodeQuery;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode\AuthCodeRepository;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock\AuthCodeRepositoryMock;
+use PHPUnit\Framework\TestCase;
 
-class AuthCodeRepositoryTest extends \PHPUnit_Framework_TestCase
+class AuthCodeRepositoryTest extends TestCase
 {
-	public function testGetNewAuthCode()
+
+	public function testGetNewAuthCode(): void
 	{
 		$repository = new AuthCodeRepository($this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock());
 		self::assertInstanceOf(AuthCodeEntity::class, $repository->getNewAuthCode());
 	}
 
-	public function testPersistNewAuthCode()
+	public function testPersistNewAuthCode(): void
 	{
 		$code = new AuthCodeEntity();
 
@@ -34,7 +36,7 @@ class AuthCodeRepositoryTest extends \PHPUnit_Framework_TestCase
 		$repository->persistNewAuthCode($code);
 	}
 
-	public function testRevokeAuthCode()
+	public function testRevokeAuthCode(): void
 	{
 		$code = new AuthCodeEntity();
 
@@ -57,7 +59,7 @@ class AuthCodeRepositoryTest extends \PHPUnit_Framework_TestCase
 		self::assertTrue($code->isRevoked());
 	}
 
-	public function testIsAuthCodeRevoked()
+	public function testIsAuthCodeRevoked(): void
 	{
 		$code = new AuthCodeEntity();
 		$code->setRevoked(true);
@@ -78,7 +80,7 @@ class AuthCodeRepositoryTest extends \PHPUnit_Framework_TestCase
 		self::assertTrue($repository->isAuthCodeRevoked('id'));
 	}
 
-	public function testCreateQuery()
+	public function testCreateQuery(): void
 	{
 		$repository = new AuthCodeRepositoryMock(
 			$this->getMockBuilder(AuthCodeQuery::class)->disableOriginalConstructor()->getMock(),
@@ -86,4 +88,5 @@ class AuthCodeRepositoryTest extends \PHPUnit_Framework_TestCase
 		);
 		self::assertInstanceOf(AuthCodeQuery::class, $repository->createQueryOriginal());
 	}
+
 }

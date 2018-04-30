@@ -11,10 +11,12 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeQuery;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeRepository;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock\ScopeRepositoryMock;
+use PHPUnit\Framework\TestCase;
 
-class ScopeRepositoryTest extends \PHPUnit_Framework_TestCase
+class ScopeRepositoryTest extends TestCase
 {
-	public function testGetScopeEntityByIdentifier()
+
+	public function testGetScopeEntityByIdentifier(): void
 	{
 		$scope = new ScopeEntity();
 
@@ -34,7 +36,7 @@ class ScopeRepositoryTest extends \PHPUnit_Framework_TestCase
 		self::assertSame($scope, $repository->getScopeEntityByIdentifier('id'));
 	}
 
-	public function testFinalizeScopes()
+	public function testFinalizeScopes(): void
 	{
 		$repository = new ScopeRepository($this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock());
 		$scopes = $repository->finalizeScopes([$scope = new ScopeEntity()], 'grant', new ClientEntity(), 'uid');
@@ -44,7 +46,7 @@ class ScopeRepositoryTest extends \PHPUnit_Framework_TestCase
 		self::assertSame($scope, array_pop($scopes));
 	}
 
-	public function testCreateQuery()
+	public function testCreateQuery(): void
 	{
 		$repository = new ScopeRepositoryMock(
 			$this->getMockBuilder(ScopeQuery::class)->disableOriginalConstructor()->getMock(),
@@ -52,4 +54,5 @@ class ScopeRepositoryTest extends \PHPUnit_Framework_TestCase
 		);
 		self::assertInstanceOf(ScopeQuery::class, $repository->createQueryOriginal());
 	}
+
 }

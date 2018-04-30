@@ -9,28 +9,21 @@ use Kdyby\Persistence\Queryable;
 
 class ClientQuery extends QueryObject
 {
+
 	/**
 	 * @var callable[]
 	 */
 	private $filters = [];
 
-	/**
-	 * @param string $identifier
-	 * @return self
-	 */
 	public function byIdentifier(string $identifier): ClientQuery
 	{
-		$this->filters[] = function (QueryBuilder $queryBuilder) use ($identifier) {
+		$this->filters[] = function (QueryBuilder $queryBuilder) use ($identifier): void {
 			$queryBuilder->andWhere('c.identifier = :identifier')->setParameter('identifier', $identifier);
 		};
 		return $this;
 	}
 
-	/**
-	 * @param Queryable $repository
-	 * @return QueryBuilder
-	 */
-	protected function doCreateQuery(Queryable $repository)
+	protected function doCreateQuery(Queryable $repository): QueryBuilder
 	{
 		$queryBuilder = $repository->createQueryBuilder()->select('c')->from(ClientEntity::class, 'c');
 		foreach ($this->filters as $filter) {
@@ -38,4 +31,5 @@ class ClientQuery extends QueryObject
 		}
 		return $queryBuilder;
 	}
+
 }

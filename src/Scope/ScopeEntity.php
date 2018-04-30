@@ -12,11 +12,12 @@ use League\OAuth2\Server\Entities\ScopeEntityInterface;
  */
 class ScopeEntity implements ScopeEntityInterface
 {
+
 	/**
 	 * @ORM\Id()
 	 * @ORM\GeneratedValue()
 	 * @ORM\Column(type="integer")
-	 * @var int
+	 * @var int|null
 	 */
 	private $id;
 
@@ -26,10 +27,7 @@ class ScopeEntity implements ScopeEntityInterface
 	 */
 	private $identifier;
 
-	/**
-	 * @return int|null
-	 */
-	public function getId()
+	public function getId(): ?int
 	{
 		return $this->id;
 	}
@@ -39,27 +37,19 @@ class ScopeEntity implements ScopeEntityInterface
 		$this->id = null;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getIdentifier()
+	public function getIdentifier(): string
 	{
 		return $this->identifier;
 	}
 
-	/**
-	 * @param string $identifier
-	 */
-	public function setIdentifier(string $identifier)
+	public function setIdentifier(string $identifier): void
 	{
 		$this->identifier = $identifier;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function jsonSerialize()
+	public function jsonSerialize(): string
 	{
 		return $this->getIdentifier();
 	}
+
 }

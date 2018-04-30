@@ -3,43 +3,29 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode;
 
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMInvalidArgumentException;
-use Kdyby\Doctrine\InvalidStateException;
-use Kdyby\Doctrine\QueryException;
 use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
 use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
 
 class AuthCodeRepository implements AuthCodeRepositoryInterface
 {
+
 	/**
 	 * @var Registry
 	 */
 	private $registry;
 
-	/**
-	 * @param Registry $registry
-	 */
 	public function __construct(Registry $registry)
 	{
 		$this->registry = $registry;
 	}
 
-	/**
-	 * @return AuthCodeEntity
-	 */
-	public function getNewAuthCode()
+	public function getNewAuthCode(): AuthCodeEntity
 	{
 		return new AuthCodeEntity();
 	}
 
-	/**
-	 * @param AuthCodeEntityInterface $authCodeEntity
-	 * @throws ORMInvalidArgumentException
-	 * @throws OptimisticLockException
-	 */
-	public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity)
+	public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity): void
 	{
 		if ($authCodeEntity instanceof AuthCodeEntity) {
 			$manager = $this->registry->getManager();
@@ -50,15 +36,14 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
 
 	/**
 	 * @param string $codeId
-	 * @throws InvalidStateException
-	 * @throws QueryException
-	 * @throws OptimisticLockException
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function revokeAuthCode($codeId)
+	public function revokeAuthCode($codeId): void
 	{
 		$manager = $this->registry->getManager();
 		/** @var AuthCodeEntity|null $authCodeEntity */
-		if ($authCodeEntity = $manager->getRepository(AuthCodeEntity::class)->fetchOne($this->createQuery()->byIdentifier($codeId))) {
+		$authCodeEntity = $manager->getRepository(AuthCodeEntity::class)->fetchOne($this->createQuery()->byIdentifier($codeId));
+		if ($authCodeEntity !== null) {
 			$authCodeEntity->setRevoked(true);
 			$manager->flush();
 		}
@@ -66,22 +51,18 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
 
 	/**
 	 * @param string $codeId
-	 * @return bool
-	 * @throws InvalidStateException
-	 * @throws QueryException
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function isAuthCodeRevoked($codeId)
+	public function isAuthCodeRevoked($codeId): bool
 	{
 		/** @var AuthCodeEntity|null $authCodeEntity */
 		$authCodeEntity = $this->registry->getManager()->getRepository(AuthCodeEntity::class)->fetchOne($this->createQuery()->byIdentifier($codeId));
-		return $authCodeEntity ? $authCodeEntity->isRevoked() : true;
+		return $authCodeEntity !== null ? $authCodeEntity->isRevoked() : true;
 	}
 
-	/**
-	 * @return AuthCodeQuery
-	 */
 	protected function createQuery(): AuthCodeQuery
 	{
 		return new AuthCodeQuery();
 	}
+
 }

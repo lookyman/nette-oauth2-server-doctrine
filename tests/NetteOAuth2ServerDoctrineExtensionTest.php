@@ -31,10 +31,12 @@ use Lookyman\NetteOAuth2Server\UI\OAuth2Presenter;
 use Lookyman\NetteOAuth2Server\User\LoginSubscriber;
 use Nette\Configurator;
 use Nette\DI\Container;
+use PHPUnit\Framework\TestCase;
 
-class NetteOAuth2ServerDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
+class NetteOAuth2ServerDoctrineExtensionTest extends TestCase
 {
-	public function testExtension()
+
+	public function testExtension(): void
 	{
 		$container = $this->createContainer();
 
@@ -60,9 +62,9 @@ class NetteOAuth2ServerDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 		$ref = new \ReflectionProperty($authorizationServer, 'privateKey');
 		$ref->setAccessible(true);
 		self::assertRegExp('#/keys/private\.key$#', $ref->getValue($authorizationServer)->getKeyPath());
-		$ref = new \ReflectionProperty($authorizationServer, 'publicKey');
+		$ref = new \ReflectionProperty($authorizationServer, 'encryptionKey');
 		$ref->setAccessible(true);
-		self::assertRegExp('#/keys/public\.key$#', $ref->getValue($authorizationServer)->getKeyPath());
+		self::assertSame('ziVrR/ktyjH0499H1sG6B/dUvEEqLEUfDRp0n0ND/34=', $ref->getValue($authorizationServer));
 
 		/** @var ResourceServer $resourceServer */
 		$resourceServer = $container->getByType(ResourceServer::class);
@@ -106,7 +108,7 @@ class NetteOAuth2ServerDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 		self::assertEquals([':Bar:foo'], $redirectConfig->getLoginDestination());
 	}
 
-	public function testGetEntityMappings()
+	public function testGetEntityMappings(): void
 	{
 		$extension = new NetteOAuth2ServerDoctrineExtension();
 		self::assertArrayHasKey('Lookyman\NetteOAuth2Server\Storage\Doctrine', $extension->getEntityMappings());
@@ -129,4 +131,5 @@ class NetteOAuth2ServerDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 		$configurator->addConfig(__DIR__ . '/config.neon');
 		return $configurator->createContainer();
 	}
+
 }

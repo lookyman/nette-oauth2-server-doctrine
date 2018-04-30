@@ -12,10 +12,12 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken\AccessTokenRepositor
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock\AccessTokenRepositoryMock;
+use PHPUnit\Framework\TestCase;
 
-class AccessTokenRepositoryTest extends \PHPUnit_Framework_TestCase
+class AccessTokenRepositoryTest extends TestCase
 {
-	public function testGetNewToken()
+
+	public function testGetNewToken(): void
 	{
 		$repository = new AccessTokenRepository($this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock());
 		$token = $repository->getNewToken($client = new ClientEntity(), [$scope = new ScopeEntity()], 'uid');
@@ -28,7 +30,7 @@ class AccessTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		self::assertEquals('uid', $token->getUserIdentifier());
 	}
 
-	public function testPersistNewAccessToken()
+	public function testPersistNewAccessToken(): void
 	{
 		$token = new AccessTokenEntity();
 
@@ -43,7 +45,7 @@ class AccessTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		$repository->persistNewAccessToken($token);
 	}
 
-	public function testRevokeAccessToken()
+	public function testRevokeAccessToken(): void
 	{
 		$token = new AccessTokenEntity();
 
@@ -66,7 +68,7 @@ class AccessTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		self::assertTrue($token->isRevoked());
 	}
 
-	public function testIsAccessTokenRevoked()
+	public function testIsAccessTokenRevoked(): void
 	{
 		$token = new AccessTokenEntity();
 		$token->setRevoked(true);
@@ -87,7 +89,7 @@ class AccessTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		self::assertTrue($repository->isAccessTokenRevoked('id'));
 	}
 
-	public function testCreateQuery()
+	public function testCreateQuery(): void
 	{
 		$repository = new AccessTokenRepositoryMock(
 			$this->getMockBuilder(AccessTokenQuery::class)->disableOriginalConstructor()->getMock(),
@@ -95,4 +97,5 @@ class AccessTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		);
 		self::assertInstanceOf(AccessTokenQuery::class, $repository->createQueryOriginal());
 	}
+
 }

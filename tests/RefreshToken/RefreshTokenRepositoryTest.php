@@ -10,16 +10,18 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenQuery;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenRepository;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock\RefreshTokenRepositoryMock;
+use PHPUnit\Framework\TestCase;
 
-class RefreshTokenRepositoryTest extends \PHPUnit_Framework_TestCase
+class RefreshTokenRepositoryTest extends TestCase
 {
-	public function testGetNewRefreshToken()
+
+	public function testGetNewRefreshToken(): void
 	{
 		$repository = new RefreshTokenRepository($this->getMockBuilder(Registry::class)->disableOriginalConstructor()->getMock());
 		self::assertInstanceOf(RefreshTokenEntity::class, $repository->getNewRefreshToken());
 	}
 
-	public function testPersistNewRefreshToken()
+	public function testPersistNewRefreshToken(): void
 	{
 		$token = new RefreshTokenEntity();
 
@@ -34,7 +36,7 @@ class RefreshTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		$repository->persistNewRefreshToken($token);
 	}
 
-	public function testRevokeRefreshToken()
+	public function testRevokeRefreshToken(): void
 	{
 		$token = new RefreshTokenEntity();
 
@@ -57,7 +59,7 @@ class RefreshTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		self::assertTrue($token->isRevoked());
 	}
 
-	public function testIsRefreshTokenRevoked()
+	public function testIsRefreshTokenRevoked(): void
 	{
 		$token = new RefreshTokenEntity();
 		$token->setRevoked(true);
@@ -78,7 +80,7 @@ class RefreshTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		self::assertTrue($repository->isRefreshTokenRevoked('id'));
 	}
 
-	public function testCreateQuery()
+	public function testCreateQuery(): void
 	{
 		$repository = new RefreshTokenRepositoryMock(
 			$this->getMockBuilder(RefreshTokenQuery::class)->disableOriginalConstructor()->getMock(),
@@ -86,4 +88,5 @@ class RefreshTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 		);
 		self::assertInstanceOf(RefreshTokenQuery::class, $repository->createQueryOriginal());
 	}
+
 }

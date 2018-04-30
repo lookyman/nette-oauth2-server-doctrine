@@ -10,10 +10,12 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthorizationRequestSerializer;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
 use Lookyman\NetteOAuth2Server\User\UserEntity;
+use PHPUnit\Framework\TestCase;
 
-class AuthorizationRequestSerializerTest extends \PHPUnit_Framework_TestCase
+class AuthorizationRequestSerializerTest extends TestCase
 {
-	public function testProcess()
+
+	public function testProcess(): void
 	{
 		$original = new AuthorizationRequest();
 		$original->setGrantTypeId('grant');
@@ -39,4 +41,5 @@ class AuthorizationRequestSerializerTest extends \PHPUnit_Framework_TestCase
 		$processed = $serializer->unserialize($serializer->serialize($original));
 		self::assertEquals($original, $processed);
 	}
+
 }

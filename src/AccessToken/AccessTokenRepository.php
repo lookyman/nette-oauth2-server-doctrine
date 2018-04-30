@@ -3,10 +3,6 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken;
 
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMInvalidArgumentException;
-use Kdyby\Doctrine\InvalidStateException;
-use Kdyby\Doctrine\QueryException;
 use Kdyby\Doctrine\Registry;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
@@ -15,26 +11,23 @@ use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 
 class AccessTokenRepository implements AccessTokenRepositoryInterface
 {
+
 	/**
 	 * @var Registry
 	 */
 	private $registry;
 
-	/**
-	 * @param Registry $registry
-	 */
 	public function __construct(Registry $registry)
 	{
 		$this->registry = $registry;
 	}
 
 	/**
-	 * @param ClientEntityInterface $clientEntity
 	 * @param ScopeEntityInterface[] $scopes
 	 * @param string|null $userIdentifier
-	 * @return AccessTokenEntity
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null)
+	public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null): AccessTokenEntity
 	{
 		$accessToken = new AccessTokenEntity();
 		$accessToken->setClient($clientEntity);
@@ -45,12 +38,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 		return $accessToken;
 	}
 
-	/**
-	 * @param AccessTokenEntityInterface $accessTokenEntity
-	 * @throws ORMInvalidArgumentException
-	 * @throws OptimisticLockException
-	 */
-	public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity)
+	public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity): void
 	{
 		if ($accessTokenEntity instanceof AccessTokenEntity) {
 			$manager = $this->registry->getManager();
@@ -61,15 +49,14 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 
 	/**
 	 * @param string $tokenId
-	 * @throws InvalidStateException
-	 * @throws QueryException
-	 * @throws OptimisticLockException
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function revokeAccessToken($tokenId)
+	public function revokeAccessToken($tokenId): void
 	{
 		$manager = $this->registry->getManager();
 		/** @var AccessTokenEntity|null $accessTokenEntity */
-		if ($accessTokenEntity = $manager->getRepository(AccessTokenEntity::class)->fetchOne($this->createQuery()->byIdentifier($tokenId))) {
+		$accessTokenEntity = $manager->getRepository(AccessTokenEntity::class)->fetchOne($this->createQuery()->byIdentifier($tokenId));
+		if ($accessTokenEntity !== null) {
 			$accessTokenEntity->setRevoked(true);
 			$manager->flush();
 		}
@@ -77,22 +64,18 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 
 	/**
 	 * @param string $tokenId
-	 * @return bool
-	 * @throws InvalidStateException
-	 * @throws QueryException
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function isAccessTokenRevoked($tokenId)
+	public function isAccessTokenRevoked($tokenId): bool
 	{
 		/** @var AccessTokenEntity|null $accessTokenEntity */
 		$accessTokenEntity = $this->registry->getManager()->getRepository(AccessTokenEntity::class)->fetchOne($this->createQuery()->byIdentifier($tokenId));
-		return $accessTokenEntity ? $accessTokenEntity->isRevoked() : true;
+		return $accessTokenEntity !== null ? $accessTokenEntity->isRevoked() : true;
 	}
 
-	/**
-	 * @return AccessTokenQuery
-	 */
 	protected function createQuery(): AccessTokenQuery
 	{
 		return new AccessTokenQuery();
 	}
+
 }

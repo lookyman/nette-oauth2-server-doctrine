@@ -6,10 +6,12 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\AuthCode;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AuthCode\AuthCodeEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Client\ClientEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
+use PHPUnit\Framework\TestCase;
 
-class AuthCodeEntityTest extends \PHPUnit_Framework_TestCase
+class AuthCodeEntityTest extends TestCase
 {
-	public function testDefaults()
+
+	public function testDefaults(): void
 	{
 		$entity = new AuthCodeEntity();
 		self::assertFalse($entity->isRevoked());
@@ -26,49 +28,49 @@ class AuthCodeEntityTest extends \PHPUnit_Framework_TestCase
 		self::assertNull($cloned->getId());
 	}
 
-	public function testRevoked()
+	public function testRevoked(): void
 	{
 		$entity = new AuthCodeEntity();
 		$entity->setRevoked(true);
 		self::assertTrue($entity->isRevoked());
 	}
 
-	public function testRedirectUri()
+	public function testRedirectUri(): void
 	{
 		$entity = new AuthCodeEntity();
 		$entity->setRedirectUri('uri');
 		self::assertEquals('uri', $entity->getRedirectUri());
 	}
 
-	public function testIdentifier()
+	public function testIdentifier(): void
 	{
 		$entity = new AuthCodeEntity();
 		$entity->setIdentifier('ident');
 		self::assertEquals('ident', $entity->getIdentifier());
 	}
 
-	public function testExpiryDateTime()
+	public function testExpiryDateTime(): void
 	{
 		$entity = new AuthCodeEntity();
 		$entity->setExpiryDateTime($dateTime = new \DateTime());
 		self::assertSame($dateTime, $entity->getExpiryDateTime());
 	}
 
-	public function testUserIdentifier()
+	public function testUserIdentifier(): void
 	{
 		$entity = new AuthCodeEntity();
 		$entity->setUserIdentifier('user');
 		self::assertEquals('user', $entity->getUserIdentifier());
 	}
 
-	public function testClient()
+	public function testClient(): void
 	{
 		$entity = new AuthCodeEntity();
 		$entity->setClient($client = new ClientEntity());
 		self::assertSame($client, $entity->getClient());
 	}
 
-	public function testScope()
+	public function testScope(): void
 	{
 		$entity = new AuthCodeEntity();
 		$entity->addScope($scope = new ScopeEntity());
@@ -76,4 +78,5 @@ class AuthCodeEntityTest extends \PHPUnit_Framework_TestCase
 		self::assertCount(1, $scopes);
 		self::assertSame($scope, array_pop($scopes));
 	}
+
 }

@@ -9,28 +9,21 @@ use Kdyby\Persistence\Queryable;
 
 class ScopeQuery extends QueryObject
 {
+
 	/**
 	 * @var callable[]
 	 */
 	private $filters = [];
 
-	/**
-	 * @param string $identifier
-	 * @return self
-	 */
 	public function byIdentifier(string $identifier): ScopeQuery
 	{
-		$this->filters[] = function (QueryBuilder $queryBuilder) use ($identifier) {
+		$this->filters[] = function (QueryBuilder $queryBuilder) use ($identifier): void {
 			$queryBuilder->andWhere('s.identifier = :identifier')->setParameter('identifier', $identifier);
 		};
 		return $this;
 	}
 
-	/**
-	 * @param Queryable $repository
-	 * @return QueryBuilder
-	 */
-	protected function doCreateQuery(Queryable $repository)
+	protected function doCreateQuery(Queryable $repository): QueryBuilder
 	{
 		$queryBuilder = $repository->createQueryBuilder()->select('s')->from(ScopeEntity::class, 's');
 		foreach ($this->filters as $filter) {
@@ -38,4 +31,5 @@ class ScopeQuery extends QueryObject
 		}
 		return $queryBuilder;
 	}
+
 }

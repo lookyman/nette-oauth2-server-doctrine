@@ -67,6 +67,7 @@ oauth2:
         refreshToken: on
     privateKey: /path/to/private.key
     publicKey: /path/to/public.key
+    encryptionKey: '32 base64encoded random bytes'
     approveDestination: :Approve:
     loginDestination: :Sign:in
     tablePrefix: nette_oauth2_server_
@@ -77,7 +78,9 @@ The `grants` section contains grants that you want to enable. By default they ar
 
 The `Authorization Code` grant also has another option to enable support for [RFC 7636](https://tools.ietf.org/html/rfc7636). You can turn it on by specifying `[pkce: on]`.
 
-Next, you're going to need a pair of private/public keys. If you didn't skip the first step you should know how to do that. If you did, now is the time. Go read it, come back when you have the keys, and enter the paths in the `privateKey` and `publicKey` options. If your private key is protected with a passphrase, specify it like this: `privateKey: [keyPath: /path/to/private.key, passPhrase: passphrase]`
+Next, you're going to need a pair of private/public keys. If you didn't skip the first step you should know how to do that. If you did, now is the time. Go read it, come back when you have the keys, and enter the paths in the `privateKey` and `publicKey` options. If your private key is protected with a passphrase, specify it like this: `privateKey: [keyPath: /path/to/private.key, passPhrase: passphrase]`.
+
+Additionaly, you need to provide an encryption key. The easiest way to do that would be to run `php -r 'echo base64_encode(random_bytes(32));'` from the terminal and paste the result in the `encryptionKey` option.
 
 If you are using either `Authorization Code` or `Implicit` grants, you need to setup the redirect destinations. These should be normal strings you would use in `$presenter->redirect()` method. The `approveDestination` is discussed in detail below. The `loginDestination` should point to the presenter/action where your application has it's login form. Both paths should be absolute (with module).
 

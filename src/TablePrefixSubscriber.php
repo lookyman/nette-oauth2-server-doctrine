@@ -16,9 +16,10 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\Scope\ScopeEntity;
 
 class TablePrefixSubscriber implements Subscriber
 {
-	const DEFAULT_PREFIX = 'nette_oauth2_server_';
 
-	const ENTITIES = [
+	public const DEFAULT_PREFIX = 'nette_oauth2_server_';
+
+	public const ENTITIES = [
 		AccessTokenEntity::class,
 		AuthCodeEntity::class,
 		ClientEntity::class,
@@ -31,22 +32,16 @@ class TablePrefixSubscriber implements Subscriber
 	 */
 	private $prefix;
 
-	/**
-	 * @param string $prefix
-	 */
 	public function __construct(string $prefix = self::DEFAULT_PREFIX)
 	{
 		$this->prefix = $prefix;
 	}
 
-	/**
-	 * @param LoadClassMetadataEventArgs $eventArgs
-	 */
-	public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
+	public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs): void
 	{
 		/** @var ClassMetadata $metadata */
 		$metadata = $eventArgs->getClassMetadata();
-		if (in_array($metadata->getName(), self::ENTITIES)) {
+		if (in_array($metadata->getName(), self::ENTITIES, true)) {
 			$metadata->setPrimaryTable([
 				'name' => self::getPrefixedName($this->prefix, $metadata->getTableName()),
 			]);
@@ -54,7 +49,7 @@ class TablePrefixSubscriber implements Subscriber
 		foreach ($metadata->getAssociationMappings() as $name => $mapping) {
 			if ($mapping['type'] === ClassMetadataInfo::MANY_TO_MANY
 				&& $mapping['isOwningSide']
-				&& in_array($mapping['targetEntity'], self::ENTITIES)
+				&& in_array($mapping['targetEntity'], self::ENTITIES, true)
 			) {
 				$metadata->associationMappings[$name]['joinTable']['name'] = self::getPrefixedName($this->prefix, $mapping['joinTable']['name']);
 			}
@@ -62,20 +57,16 @@ class TablePrefixSubscriber implements Subscriber
 	}
 
 	/**
-	 * @return array
+	 * @return string[]
 	 */
-	public function getSubscribedEvents()
+	public function getSubscribedEvents(): array
 	{
 		return [Events::loadClassMetadata];
 	}
 
-	/**
-	 * @param string $prefix
-	 * @param string $name
-	 * @return string
-	 */
 	protected static function getPrefixedName(string $prefix, string $name): string
 	{
 		return $prefix . $name;
 	}
+
 }

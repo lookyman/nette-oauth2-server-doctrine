@@ -1,4 +1,5 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../vendor/autoload.php';
+chmod(__DIR__ . '/keys/private.key', 0660);
+chmod(__DIR__ . '/keys/public.key', 0660);

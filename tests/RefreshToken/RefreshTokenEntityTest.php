@@ -5,10 +5,12 @@ namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\RefreshToken;
 
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken\AccessTokenEntity;
 use Lookyman\NetteOAuth2Server\Storage\Doctrine\RefreshToken\RefreshTokenEntity;
+use PHPUnit\Framework\TestCase;
 
-class RefreshTokenEntityTest extends \PHPUnit_Framework_TestCase
+class RefreshTokenEntityTest extends TestCase
 {
-	public function testDefaults()
+
+	public function testDefaults(): void
 	{
 		$entity = new RefreshTokenEntity();
 		self::assertFalse($entity->isRevoked());
@@ -23,31 +25,32 @@ class RefreshTokenEntityTest extends \PHPUnit_Framework_TestCase
 		self::assertNull($cloned->getId());
 	}
 
-	public function testRevoked()
+	public function testRevoked(): void
 	{
 		$entity = new RefreshTokenEntity();
 		$entity->setRevoked(true);
 		self::assertTrue($entity->isRevoked());
 	}
 
-	public function testIdentifier()
+	public function testIdentifier(): void
 	{
 		$entity = new RefreshTokenEntity();
 		$entity->setIdentifier('ident');
 		self::assertEquals('ident', $entity->getIdentifier());
 	}
 
-	public function testExpiryDateTime()
+	public function testExpiryDateTime(): void
 	{
 		$entity = new RefreshTokenEntity();
 		$entity->setExpiryDateTime($dateTime = new \DateTime());
 		self::assertSame($dateTime, $entity->getExpiryDateTime());
 	}
 
-	public function testAccessToken()
+	public function testAccessToken(): void
 	{
 		$entity = new RefreshTokenEntity();
 		$entity->setAccessToken($token = new AccessTokenEntity());
 		self::assertSame($token, $entity->getAccessToken());
 	}
+
 }

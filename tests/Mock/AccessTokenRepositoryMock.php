@@ -9,34 +9,26 @@ use Lookyman\NetteOAuth2Server\Storage\Doctrine\AccessToken\AccessTokenRepositor
 
 class AccessTokenRepositoryMock extends AccessTokenRepository
 {
+
 	/**
 	 * @var AccessTokenQuery
 	 */
 	private $query;
 
-	/**
-	 * @param AccessTokenQuery $query
-	 * @param Registry $registry
-	 */
 	public function __construct(AccessTokenQuery $query, Registry $registry)
 	{
 		parent::__construct($registry);
 		$this->query = $query;
 	}
 
-	/**
-	 * @return AccessTokenQuery
-	 */
 	protected function createQuery(): AccessTokenQuery
 	{
 		return $this->query;
 	}
 
-	/**
-	 * @return AccessTokenQuery
-	 */
 	public function createQueryOriginal(): AccessTokenQuery
 	{
 		return parent::createQuery();
 	}
+
 }

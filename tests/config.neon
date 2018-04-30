@@ -26,6 +26,7 @@ oauth2:
 		keyPath: %appDir%/keys/private.key
 		passPhrase: foobar
 	publicKey: %appDir%/keys/public.key
+	encryptionKey: 'ziVrR/ktyjH0499H1sG6B/dUvEEqLEUfDRp0n0ND/34='
 	approveDestination: :Foo:bar
 	loginDestination: :Bar:foo
 	tablePrefix: test_

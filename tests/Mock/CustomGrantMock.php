@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Lookyman\NetteOAuth2Server\Storage\Doctrine\Tests\Mock;
 
+use Defuse\Crypto\Key;
 use League\Event\EmitterInterface;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Grant\GrantTypeInterface;
@@ -15,117 +16,79 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class CustomGrantMock implements GrantTypeInterface
 {
-	/**
-	 * @param EmitterInterface $emitter
-	 * @return $this
-	 */
-	public function setEmitter(EmitterInterface $emitter = null)
+
+	public function setEmitter(?EmitterInterface $emitter = null): self
 	{
 		return $this;
 	}
 
-	/**
-	 * @return EmitterInterface
-	 */
-	public function getEmitter()
+	public function getEmitter(): EmitterInterface
 	{
 	}
 
-	/**
-	 * @param \DateInterval $refreshTokenTTL
-	 */
-	public function setRefreshTokenTTL(\DateInterval $refreshTokenTTL)
+	public function setRefreshTokenTTL(\DateInterval $refreshTokenTTL): void
 	{
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getIdentifier()
+	public function getIdentifier(): string
 	{
 		return 'custom';
 	}
 
-	/**
-	 * @param ServerRequestInterface $request
-	 * @param ResponseTypeInterface $responseType
-	 * @param \DateInterval $accessTokenTTL
-	 * @return ResponseTypeInterface
-	 */
 	public function respondToAccessTokenRequest(
 		ServerRequestInterface $request,
 		ResponseTypeInterface $responseType,
 		\DateInterval $accessTokenTTL
-	)
-	{
+	): ResponseTypeInterface {
 	}
 
-	/**
-	 * @param ServerRequestInterface $request
-	 * @return bool
-	 */
-	public function canRespondToAuthorizationRequest(ServerRequestInterface $request)
+	public function canRespondToAuthorizationRequest(ServerRequestInterface $request): bool
 	{
 		return false;
 	}
 
-	/**
-	 * @param ServerRequestInterface $request
-	 * @return AuthorizationRequest
-	 */
-	public function validateAuthorizationRequest(ServerRequestInterface $request)
+	public function validateAuthorizationRequest(ServerRequestInterface $request): AuthorizationRequest
 	{
 	}
 
-	/**
-	 * @param AuthorizationRequest $authorizationRequest
-	 * @return ResponseTypeInterface
-	 */
-	public function completeAuthorizationRequest(AuthorizationRequest $authorizationRequest)
+	public function completeAuthorizationRequest(AuthorizationRequest $authorizationRequest): ResponseTypeInterface
 	{
 	}
 
-	/**
-	 * @param ServerRequestInterface $request
-	 * @return bool
-	 */
-	public function canRespondToAccessTokenRequest(ServerRequestInterface $request)
+	public function canRespondToAccessTokenRequest(ServerRequestInterface $request): bool
 	{
 		return false;
 	}
 
-	/**
-	 * @param ClientRepositoryInterface $clientRepository
-	 */
-	public function setClientRepository(ClientRepositoryInterface $clientRepository)
+	public function setClientRepository(ClientRepositoryInterface $clientRepository): void
+	{
+	}
+
+	public function setAccessTokenRepository(AccessTokenRepositoryInterface $accessTokenRepository): void
+	{
+	}
+
+	public function setScopeRepository(ScopeRepositoryInterface $scopeRepository): void
 	{
 	}
 
 	/**
-	 * @param AccessTokenRepositoryInterface $accessTokenRepository
+	 * @param string $scope
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function setAccessTokenRepository(AccessTokenRepositoryInterface $accessTokenRepository)
+	public function setDefaultScope($scope): void
+	{
+	}
+
+	public function setPrivateKey(CryptKey $privateKey): void
 	{
 	}
 
 	/**
-	 * @param ScopeRepositoryInterface $scopeRepository
+	 * @param string|Key|null $key
 	 */
-	public function setScopeRepository(ScopeRepositoryInterface $scopeRepository)
+	public function setEncryptionKey($key = null): void
 	{
 	}
 
-	/**
-	 * @param CryptKey $privateKey
-	 */
-	public function setPrivateKey(CryptKey $privateKey)
-	{
-	}
-
-	/**
-	 * @param CryptKey $publicKey
-	 */
-	public function setPublicKey(CryptKey $publicKey)
-	{
-	}
 }
