@@ -143,7 +143,7 @@ class AuthCodeEntity implements AuthCodeEntityInterface
 		$this->userIdentifier = $identifier;
 	}
 
-	public function getUserIdentifier(): string
+	public function getUserIdentifier()
 	{
 		return $this->userIdentifier;
 	}
