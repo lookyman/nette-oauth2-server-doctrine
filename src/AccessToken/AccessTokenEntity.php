@@ -103,7 +103,10 @@ class AccessTokenEntity implements AccessTokenEntityInterface
 		return $this->expiryDateTime;
 	}
 
-	public function getUserIdentifier(): ?string
+	/**
+	 * @return int|string|null
+	 */
+	public function getUserIdentifier()
 	{
 		return $this->userIdentifier;
 	}
